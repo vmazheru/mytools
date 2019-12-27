@@ -4,5 +4,8 @@
 .settings
 .externalToolBuilders
 target
+*.iml
+*.ipr
+*.iws
 *.idea
 
