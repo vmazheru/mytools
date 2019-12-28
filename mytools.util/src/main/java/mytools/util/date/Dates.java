@@ -18,10 +18,6 @@ public final class Dates {
     
     private static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
     
-    public static long toEpochSeconds(LocalDateTime t) {
-        return t.atZone(SYSTEM_ZONE).toEpochSecond();
-    }
-    
     public static LocalDateTime toLocalDateTime(long epochSeconds) {
         Instant i = Instant.ofEpochSecond(epochSeconds, 0);
         ZonedDateTime utcZoned = ZonedDateTime.ofInstant(i, SYSTEM_ZONE);
