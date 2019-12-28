@@ -11,6 +11,8 @@ import java.util.Date;
 
 public final class Dates {
     
+    private Dates() {}
+    
     public static DateFormat DATE_TO_STRING_FORMAT =
             new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
     
