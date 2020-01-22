@@ -2,43 +2,35 @@ package mytools.util.date;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
-public final class Dates {
-    
-    private Dates() {}
+import mytools.util.date.impl.DateConversions;
+
+public interface Dates {
     
     public static DateFormat DATE_TO_STRING_FORMAT =
             new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
     
-    private static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
-    
-    public static LocalDateTime toLocalDateTime(long epochSeconds) {
-        Instant i = Instant.ofEpochSecond(epochSeconds, 0);
-        ZonedDateTime utcZoned = ZonedDateTime.ofInstant(i, SYSTEM_ZONE);
-        return utcZoned.toLocalDateTime();
+    public static LocalDateTime localDateTime(long epochSeconds) {
+        return DateConversions.localDateTime(epochSeconds);
     }
 
-    public static LocalDateTime toLocalDateTime(Date date) {
-        return date.toInstant().atZone(SYSTEM_ZONE).toLocalDateTime();
+    public static LocalDateTime localDateTime(Date date) {
+        return DateConversions.localDateTime(date);
     }
 
-    public static LocalDate toLocalDate(Date date) {
-        return toLocalDateTime(date).toLocalDate();
+    public static LocalDate localDate(Date date) {
+        return DateConversions.localDate(date);
     }
 
-    public static Date fromLocalDateTime(LocalDateTime dateTime) {
-        return Date.from(dateTime.atZone(SYSTEM_ZONE).toInstant());
+    public static Date date(LocalDateTime dateTime) {
+        return DateConversions.date(dateTime);
     }
     
-    public static Date fromLocalDate(LocalDate date) {
-        return fromLocalDateTime(date.atStartOfDay());
+    public static Date date(LocalDate date) {
+        return DateConversions.date(date);
     }
-
 
 }

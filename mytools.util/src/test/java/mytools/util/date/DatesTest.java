@@ -20,18 +20,18 @@ public class DatesTest {
         Instant i = LocalDate.now().atStartOfDay().toInstant(OffsetDateTime.now().getOffset());
         Clock clock = Clock.fixed(i, ZoneId.systemDefault());
                 
-        // Derive different time object from that instant
+        // Derive different time objects from that instant
         LocalDateTime localDateTime = LocalDateTime.now(clock);
         LocalDate localDate = LocalDate.now(clock);
         Date date = Date.from(i);
         long epochSeconds = date.getTime() / 1000;
         
         // Verify that Dates class methods convert them to each other correctly
-        assertEquals(date, Dates.fromLocalDateTime(localDateTime));
-        assertEquals(date, Dates.fromLocalDate(localDate));
-        assertEquals(localDate, Dates.toLocalDate(date));
-        assertEquals(localDateTime, Dates.toLocalDateTime(date));
-        assertEquals(localDateTime, Dates.toLocalDateTime(epochSeconds));
+        assertEquals(date, Dates.date(localDateTime));
+        assertEquals(date, Dates.date(localDate));
+        assertEquals(localDate, Dates.localDate(date));
+        assertEquals(localDateTime, Dates.localDateTime(date));
+        assertEquals(localDateTime, Dates.localDateTime(epochSeconds));
     }
 
 }
