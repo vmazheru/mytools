@@ -46,6 +46,7 @@
 
   <modules>
     <module>mytools.util</module>
+    <module>mytools.test</module>
     <module>mytools.ugly</module>
   </modules>
 
