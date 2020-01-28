@@ -74,5 +74,15 @@ public class StringsTest {
         assertEquals(null, camelToSpaced(null));
     }
     
+    @Test
+    public void testTrimToNull() {
+        assertEquals("hello", trimToNull("hello"));
+        assertEquals("hello", trimToNull("\thello"));
+        assertEquals("hello", trimToNull("hello   "));
+        assertEquals("hello", trimToNull(" hello\n"));
+        assertNull(trimToNull(""));
+        assertNull(trimToNull("\t\n   "));
+    }
+    
     
 }

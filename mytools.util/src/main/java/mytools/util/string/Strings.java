@@ -1,6 +1,7 @@
 package mytools.util.string;
 
 import mytools.util.string.impl.CaseConversions;
+import mytools.util.string.impl.Trimmer;
 import mytools.util.string.impl.Capitalizations;
 
 public interface Strings {
@@ -48,5 +49,12 @@ public interface Strings {
     
     public static String unCapitalize(CharSequence s) {
         return Capitalizations.unCapitalize(s);
+    }
+    
+    
+    ///////////////////// Trim ///////////////////////////
+    
+    public static String trimToNull(String s) {
+        return Trimmer.trimToNull(s);
     }
 }
