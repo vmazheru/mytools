@@ -1,7 +1,6 @@
 package mytools.testapp;
 
-import java.text.DateFormat;
-
+import mytools.stringparsers.StringParsers;
 import mytools.util.date.Dates;
 
 public class App {
@@ -9,6 +8,10 @@ public class App {
     public static void main(String[] args) {
 
         System.out.println(Dates.DATE_TO_STRING_FORMAT);
+        
+        System.out.println(StringParsers.Defaults.stringParser.parse(new java.util.Date().toString()));
+        
+        
 
     }
 
