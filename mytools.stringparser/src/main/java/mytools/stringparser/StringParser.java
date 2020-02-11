@@ -1,4 +1,4 @@
-package mytools.stringparsers;
+package mytools.stringparser;
 
 import java.util.function.Function;
 

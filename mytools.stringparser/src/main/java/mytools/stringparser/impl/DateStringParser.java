@@ -1,4 +1,4 @@
-package mytools.stringparsers.impl;
+package mytools.stringparser.impl;
 
 import java.text.DateFormat;
 import java.text.ParseException;

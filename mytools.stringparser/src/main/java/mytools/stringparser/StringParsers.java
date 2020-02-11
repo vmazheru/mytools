@@ -1,4 +1,4 @@
-package mytools.stringparsers;
+package mytools.stringparser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import mytools.stringparsers.impl.DateStringParser;
+import mytools.stringparser.impl.DateStringParser;
 
 /**
  * This class contains functions which convert (parse) strings to objects.

@@ -1,6 +1,6 @@
 package mytools.testapp;
 
-import mytools.stringparsers.StringParsers;
+import mytools.stringparser.StringParsers;
 import mytools.util.date.Dates;
 
 public class App {

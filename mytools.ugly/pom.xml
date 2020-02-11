@@ -34,7 +34,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mytools.stringparsers</artifactId>
+      <artifactId>mytools.stringparser</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
