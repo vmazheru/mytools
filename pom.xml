@@ -46,9 +46,11 @@
 
   <modules>
     <module>mytools.util</module>
+    <module>mytools.function</module>
     <module>mytools.test</module>
     <module>mytools.collectionutil</module>
     <module>mytools.stringparsers</module>
+    <module>mytools.reflection</module>
     <module>mytools.ugly</module>
   </modules>
 
