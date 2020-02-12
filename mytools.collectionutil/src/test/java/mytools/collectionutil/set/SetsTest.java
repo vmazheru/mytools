@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
-
 public class SetsTest {
     
     private static final Collection<String> one = Arrays.asList("one", "two", "three");
