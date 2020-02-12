@@ -1,3 +1,3 @@
-module mytools.strinparsers {
+module mytools.strinparser {
     exports mytools.stringparser;
 }

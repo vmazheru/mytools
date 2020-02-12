@@ -1,3 +1,3 @@
-module mytools.ugly {
+module mytools.collectionutil {
     exports mytools.collectionutil.set;
 }
