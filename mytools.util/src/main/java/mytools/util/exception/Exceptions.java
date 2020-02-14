@@ -32,14 +32,5 @@ public final class Exceptions {
     public static String getRootStackTrace(Throwable e) {
         return getStackTrace(getRootCause(e));
     }
-    
-    public static RuntimeException toUnchecked(Exception e) {
-        if (e instanceof RuntimeException) {
-            return (RuntimeException)e;
-        } else if (e instanceof IOException) {
-            return new UncheckedIOException((IOException)e);
-        }
-        return new RuntimeException(e);
-    }
 
 }
