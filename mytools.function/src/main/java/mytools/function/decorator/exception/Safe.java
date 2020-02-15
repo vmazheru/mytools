@@ -3,12 +3,8 @@ package mytools.function.decorator.exception;
 import java.util.stream.Stream;
 
 /**
- * This exception decorator implementation make execution of operations "safe",
- * that is it returns null instead of throwing an exception should something go wrong.
- * 
- * <p>An optional array of exception classes may be given to the decorator, so
- * it will only check for exceptions of these classes. Otherwise, it'll return 
- * null in case of any type of exception.
+ * Transform a function which throws exception into a function which returns null in cases
+ * when exception is thrown. 
  */
 final class Safe <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
     
@@ -21,7 +17,7 @@ final class Safe <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
     
     @Override
     R dealWithException(Exception e) {
-        if (catchExceptions == null || catchExceptions != null && exceptionMatches(e)) {
+        if (catchExceptions.length == 0 || catchExceptions != null && exceptionMatches(e)) {
             return null;
         }
         throw toUnchecked(e);
