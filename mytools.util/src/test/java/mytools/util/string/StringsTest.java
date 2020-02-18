@@ -1,7 +1,17 @@
 package mytools.util.string;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static mytools.util.string.Strings.*;
+import static mytools.util.string.Strings.camelToDashed;
+import static mytools.util.string.Strings.camelToDotted;
+import static mytools.util.string.Strings.camelToSnake;
+import static mytools.util.string.Strings.camelToSpaced;
+import static mytools.util.string.Strings.capitalize;
+import static mytools.util.string.Strings.dashedToCamel;
+import static mytools.util.string.Strings.dottedToCamel;
+import static mytools.util.string.Strings.snakeToCamel;
+import static mytools.util.string.Strings.spacedToCamel;
+import static mytools.util.string.Strings.trimToNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,65 +25,65 @@ public class StringsTest {
         assertEquals(" ", capitalize(" "));
         assertEquals(null, capitalize(null));
     }
-    
+
     @Test
     public void testSnakeToCamel() {
         assertEquals("helloHappyWorld", snakeToCamel("hello_happy_world"));
         assertEquals("", snakeToCamel(""));
         assertEquals(null, snakeToCamel(null));
     }
-    
+
     @Test
     public void testCamelToSnake() {
         assertEquals("hello_happy_world", camelToSnake("helloHappyWorld"));
         assertEquals("", camelToSnake(""));
         assertEquals(null, camelToSnake(null));
     }
-    
+
     @Test
     public void testDashedToCamel() {
         assertEquals("helloHappyWorld", dashedToCamel("hello-happy-world"));
         assertEquals("", dashedToCamel(""));
         assertEquals(null, dashedToCamel(null));
     }
-    
+
     @Test
     public void testCamelToDashed() {
         assertEquals("hello-happy-world", camelToDashed("helloHappyWorld"));
         assertEquals("", camelToDashed(""));
         assertEquals(null, camelToDashed(null));
     }
-    
+
     @Test
     public void testDottedToCamel() {
         assertEquals("helloHappyWorld", dottedToCamel("hello.happy.world"));
         assertEquals("", dottedToCamel(""));
         assertEquals(null, dottedToCamel(null));
     }
-    
+
     @Test
     public void testCamelToDotted() {
         assertEquals("hello.happy.world", camelToDotted("helloHappyWorld"));
         assertEquals("", camelToDotted(""));
         assertEquals(null, camelToDotted(null));
     }
-    
+
     @Test
     public void testSpacedToCamel() {
         assertEquals("helloHappyWorld", spacedToCamel("Hello happy world"));
-        assertEquals("helloHappyWorld", spacedToCamel("Hello   Happy    WOrld"));
+        assertEquals("helloHappyWorld", spacedToCamel("Hello  Happy    WOrld"));
         assertEquals("", spacedToCamel("   "));
         assertEquals("", spacedToCamel(""));
         assertEquals(null, spacedToCamel(null));
     }
-    
+
     @Test
     public void testCamelToSpaced() {
         assertEquals("hello happy world", camelToSpaced("helloHappyWorld"));
         assertEquals("", camelToSpaced(""));
         assertEquals(null, camelToSpaced(null));
     }
-    
+
     @Test
     public void testTrimToNull() {
         assertEquals("hello", trimToNull("hello"));
@@ -83,6 +93,6 @@ public class StringsTest {
         assertNull(trimToNull(""));
         assertNull(trimToNull("\t\n   "));
     }
-    
-    
+
+
 }

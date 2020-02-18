@@ -1,6 +1,6 @@
 package mytools.util.thread;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -19,5 +19,5 @@ public class ThreadsTest {
                 "Execution time must be much less than sleep time, " +
                 "since the thread has been interrupted while sleeping");
     }
-    
+
 }

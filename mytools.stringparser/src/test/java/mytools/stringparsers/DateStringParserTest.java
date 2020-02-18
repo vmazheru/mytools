@@ -1,6 +1,6 @@
 package mytools.stringparsers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import mytools.stringparser.StringParsers;
 
 public class DateStringParserTest {
-    
+
     @Test
     public void parseDate() {
         Date d = getDate();
@@ -19,7 +19,7 @@ public class DateStringParserTest {
         assertEquals(d, StringParsers.parseDate(str));
         assertEquals(d, StringParsers.get(Date.class).parse(str));
     }
-    
+
     private static Date getDate() {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
