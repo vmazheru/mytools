@@ -95,14 +95,33 @@
         </configuration>
         <executions>
           <execution>
-            <id>validate</id>
+            <id>test-validate</id>
             <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>
           </execution>
         </executions>
-      </plugin>   
+      </plugin>
+      <!-- 
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>4.0.0</version>
+        <configuration>
+          <effort>Max</effort>
+          <threshold>Low</threshold>
+          <xmlOutput>true</xmlOutput>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+       -->   
     </plugins>
   </build>
   

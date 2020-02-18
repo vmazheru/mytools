@@ -1,5 +1,6 @@
 package mytools.function.decorator.exception;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -28,13 +29,14 @@ final class Uncheck <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
 
     private RuntimeException toSpecificException(Exception e) {
         try {
-            RuntimeException ex = exceptionClass.getConstructor(Throwable.class)
-                    .newInstance(e);
-            return ex;
+            Constructor<? extends RuntimeException> c =
+                    exceptionClass.getDeclaredConstructor(Throwable.class);
+            c.setAccessible(true);
+            return c.newInstance(e);
         } catch (NoSuchMethodException  | InvocationTargetException |
                  IllegalAccessException | InstantiationException ex) {
             throw new RuntimeException(
-                    "Error calling non-argument constructor of class " +
+                    "Error calling constructor of class " +
                             exceptionClass + ": " + ex.getMessage());
         }
     }
