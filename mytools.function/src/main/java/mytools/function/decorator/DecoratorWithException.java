@@ -1,6 +1,11 @@
 package mytools.function.decorator;
 
-import static mytools.function.Conversions.*;
+import static mytools.function.Conversions.toBC;
+import static mytools.function.Conversions.toBF;
+import static mytools.function.Conversions.toC;
+import static mytools.function.Conversions.toF;
+import static mytools.function.Conversions.toR;
+import static mytools.function.Conversions.toS;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -16,14 +21,14 @@ import mytools.function.RunnableWithException;
 import mytools.function.SupplierWithException;
 
 /**
- * The purpose of this decorator is to transform functions which throw checked exceptions into functions 
- * which throw unchecked exception.
- * See a description of the {@link Decorator} class on how decorators work.
- * 
- * @see Decorator 
+ * The purpose of this decorator is to transform functions which throw checked
+ * exceptions into functions which throw unchecked exception. See a description
+ * of the {@link Decorator} class on how decorators work.
+ *
+ * @see Decorator
  */
 public interface DecoratorWithException<T,U,R> {
-    
+
     /**
      * Decorate a {@link RunnableWithException}
      */

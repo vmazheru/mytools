@@ -7,11 +7,11 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 
 public final class Exceptions {
-    
-    private Exceptions() {}
-    
+
+    private Exceptions() { }
+
     public static String getStackTrace(Throwable e) {
-        try(Writer result = new StringWriter();
+        try (Writer result = new StringWriter();
             PrintWriter printWriter = new PrintWriter(result)) {
             e.printStackTrace(printWriter);
             return result.toString();
@@ -23,7 +23,7 @@ public final class Exceptions {
     public static Throwable getRootCause(Throwable e) {
         Throwable c = e;
         Throwable cause = c;
-        while((c = c.getCause()) != null) {
+        while ((c = c.getCause()) != null) {
             cause = c;
         }
         return cause;

@@ -7,7 +7,8 @@ import java.util.function.BiFunction;
 import mytools.function.BiFunctionWithException;
 import mytools.function.decorator.DecoratorWithException;
 
-abstract class AbstractExceptionHandlingDecorator<T,U,R> implements DecoratorWithException<T,U,R> {
+abstract class AbstractExceptionHandlingDecorator<T,U,R>
+    implements DecoratorWithException<T,U,R> {
 
     @Override
     public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {
@@ -19,9 +20,9 @@ abstract class AbstractExceptionHandlingDecorator<T,U,R> implements DecoratorWit
             }
         };
     }
-    
+
     abstract R dealWithException(Exception e);
-    
+
     static RuntimeException toUnchecked(Exception e) {
         if (e instanceof RuntimeException) {
             return (RuntimeException)e;

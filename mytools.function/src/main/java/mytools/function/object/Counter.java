@@ -4,12 +4,12 @@ public final class Counter {
 
     private int i;
     private final int initValue;
-    
+
     public Counter(int initValue) {
         this.initValue = initValue;
         i = initValue;
     }
-    
+
     public Counter() {
         this(0);
     }
@@ -21,19 +21,19 @@ public final class Counter {
     public void increment() {
         i++;
     }
-    
+
     public void decrement() {
         i--;
     }
-    
+
     public void reset() {
         i = initValue;
     }
-    
+
     public int get() {
         return i;
     }
-    
+
     public int getAndIncrement() {
         int n = i;
         i++;
@@ -45,11 +45,11 @@ public final class Counter {
         reset();
         return n;
     }
-    
+
     public int incrementAndGet() {
         return ++i;
     }
-    
+
     @Override
     public String toString() {
         return Integer.toString(i);

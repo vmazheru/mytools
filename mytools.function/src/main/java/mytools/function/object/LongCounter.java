@@ -1,15 +1,15 @@
 package mytools.function.object;
 
 public final class LongCounter {
-    
+
     private long i;
     private final long initValue;
-    
+
     public LongCounter(long initValue) {
         this.initValue = initValue;
         i = initValue;
     }
-    
+
     public LongCounter() {
         this(0);
     }
@@ -21,19 +21,19 @@ public final class LongCounter {
     public void increment() {
         i++;
     }
-    
+
     public void decrement() {
         i--;
     }
-    
+
     public void reset() {
         i = initValue;
     }
-    
+
     public long get() {
         return i;
     }
-    
+
     public long getAndIncrement() {
         long n = i;
         i++;
@@ -45,11 +45,11 @@ public final class LongCounter {
         reset();
         return n;
     }
-    
+
     public long incrementAndGet() {
         return ++i;
     }
-    
+
     @Override
     public String toString() {
         return Long.toString(i);

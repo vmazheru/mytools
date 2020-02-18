@@ -15,7 +15,7 @@ public class DateStringParserTest {
     public void parseDate() {
         Date d = getDate();
         String str = d.toString();
-        assertEquals(d, StringParsers.Defaults.dateParser.parse(str));
+        assertEquals(d, StringParsers.Defaults.DATE_PARSER.parse(str));
         assertEquals(d, StringParsers.parseDate(str));
         assertEquals(d, StringParsers.get(Date.class).parse(str));
     }
