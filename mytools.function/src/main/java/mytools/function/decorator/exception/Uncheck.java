@@ -12,8 +12,6 @@ final class Uncheck <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
 
     private final Class<? extends RuntimeException> exceptionClass;
 
-    private String s;
-
     Uncheck() {
         this(null);
     }
