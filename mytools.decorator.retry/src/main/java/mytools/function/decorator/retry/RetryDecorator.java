@@ -1,5 +1,6 @@
 package mytools.function.decorator.retry;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -12,7 +13,7 @@ import mytools.util.thread.Threads;
  * {@link RetryPoliy}.
  *
  * <p>
- * The decorator may be given an array of exception types which it should
+ * The decorator may be given a list of exception types which it should
  * intercept. If no array of exception classes is given, the decorator will
  * retry on any exception type.
  *
@@ -29,7 +30,7 @@ import mytools.util.thread.Threads;
 final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
 
     private final RetryPolicy retryPolicy;
-    private final Class<? extends Exception>[] exceptionClasses;
+    private final List<Class<? extends Exception>> exceptionClasses;
     private final Optional<Consumer<Exception>> before;
     private final Optional<Runnable> after;
 
@@ -37,7 +38,7 @@ final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
      * Package access constructor.
      *
      * @param retryPolicy      Retry policy
-     * @param exceptionClasses Array of exception classes on which the decorator
+     * @param exceptionClasses List of exception classes on which the decorator
      *                         should retry
      * @param before           A lambda to run on exception thrown (before the
      *                         decorator goes to sleep)
@@ -46,7 +47,7 @@ final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
      */
     RetryDecorator(
             RetryPolicy retryPolicy,
-            Class<? extends Exception>[] exceptionClasses,
+            List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> before,
             Runnable after) {
         this.retryPolicy = retryPolicy;
@@ -99,7 +100,7 @@ final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
     }
 
     private boolean ofTargetClass(Exception e) {
-        if (exceptionClasses == null) {
+        if (exceptionClasses == null || exceptionClasses.isEmpty()) {
             return true;
         }
         for (Class<? extends Exception> klass : exceptionClasses) {
