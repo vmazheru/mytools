@@ -70,43 +70,25 @@ import java.util.function.Supplier;
  */
 public interface Decorator<T,U,R> {
 
-    /**
-     * Decorate a {@code Runnable}
-     */
     default Runnable decorate(Runnable f) {
         return toR(decorate(toBF(f)));
     }
 
-    /**
-     * Decorate a {@code Supplier}
-     */
     default Supplier<R> decorate(Supplier<R> f) {
         return toS(decorate(toBF(f)));
     }
 
-    /**
-     * Decorate a {@code Consumer}
-     */
     default Consumer<T> decorate(Consumer<T> f) {
         return toC(decorate(toBF(f)));
     }
 
-    /**
-     * Decorate a {@code Function}
-     */
     default Function<T, R> decorate(Function<T, R> f) {
         return toF(decorate(toBF(f)));
     }
 
-    /**
-     * Decorate a {@code BiConsumer}
-     */
     default BiConsumer<T, U> decorate(BiConsumer<T, U> f) {
         return toBC(decorate(toBF(f)));
     }
 
-    /**
-     * Decorate a {@code BiFunction}
-     */
     BiFunction<T, U, R> decorate(BiFunction<T, U, R> f);
 }
