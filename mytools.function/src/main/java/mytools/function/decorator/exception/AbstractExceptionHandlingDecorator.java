@@ -5,10 +5,10 @@ import java.io.UncheckedIOException;
 import java.util.function.BiFunction;
 
 import mytools.function.BiFunctionWithException;
-import mytools.function.decorator.DecoratorWithException;
+import mytools.function.decorator.ExceptionHidingDecorator;
 
 abstract class AbstractExceptionHandlingDecorator<T,U,R>
-    implements DecoratorWithException<T,U,R> {
+    implements ExceptionHidingDecorator<T,U,R> {
 
     @Override
     public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {

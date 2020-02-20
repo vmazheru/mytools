@@ -6,12 +6,10 @@ import static mytools.function.Conversions.toC;
 import static mytools.function.Conversions.toF;
 import static mytools.function.Conversions.toR;
 import static mytools.function.Conversions.toS;
+import static mytools.function.Conversions.withException;
+import static mytools.function.decorator.exception.ExceptionDecorators.unchecked;
 
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import mytools.function.BiConsumerWithException;
 import mytools.function.BiFunctionWithException;
@@ -21,33 +19,37 @@ import mytools.function.RunnableWithException;
 import mytools.function.SupplierWithException;
 
 /**
- * The purpose of this decorator is to transform functions which throw checked
- * exceptions into functions which throw unchecked exception. See a description
- * of the {@link Decorator} class on how decorators work.
- *
- * @see Decorator
+ * Add decorating function with exceptions to the original {@link Decorator}
  */
-public interface DecoratorWithException<T,U,R> {
+public interface DecoratorWithException<T,U,R> extends Decorator<T,U,R> {
 
-    default Runnable decorate(RunnableWithException f) {
+    default RunnableWithException decorate(RunnableWithException f) {
         return toR(decorate(toBF(f)));
     }
 
-    default Supplier<R> decorate(SupplierWithException<R> f) {
+    default SupplierWithException<R> decorate(SupplierWithException<R> f) {
         return toS(decorate(toBF(f)));
     }
 
-    default Consumer<T> decorate(ConsumerWithException<T> f) {
+    default ConsumerWithException<T> decorate(ConsumerWithException<T> f) {
         return toC(decorate(toBF(f)));
     }
 
-    default Function<T, R> decorate(FunctionWithException<T, R> f) {
+    default FunctionWithException<T, R> decorate(
+            FunctionWithException<T, R> f) {
         return toF(decorate(toBF(f)));
     }
 
-    default BiConsumer<T, U> decorate(BiConsumerWithException<T, U> f) {
+    default BiConsumerWithException<T, U> decorate(
+            BiConsumerWithException<T, U> f) {
         return toBC(decorate(toBF(f)));
     }
 
-    BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f);
+    @Override
+    default BiFunction<T, U, R> decorate(BiFunction<T, U, R> f) {
+        return unchecked(decorate(withException(f)));
+    }
+
+    BiFunctionWithException<T, U, R> decorate(
+            BiFunctionWithException<T, U, R> f);
 }

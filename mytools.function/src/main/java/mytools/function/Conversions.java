@@ -698,4 +698,33 @@ public interface Conversions {
         return (t, u) -> f.apply(t);
     }
 
+
+    ////////////////////// Functions to functions with exceptions  //////////
+
+    static RunnableWithException withException(Runnable f) {
+        return () -> f.run();
+    }
+
+    static <R> SupplierWithException<R> withException(Supplier<R> f) {
+        return () -> f.get();
+    }
+
+    static <T> ConsumerWithException<T> withException(Consumer<T> f) {
+        return t -> f.accept(t);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> withException(
+            BiConsumerWithException<T, U> f) {
+        return (t, u) -> f.accept(t, u);
+    }
+
+    static <T, R> FunctionWithException<T, R> withException(Function<T, R> f) {
+        return t -> f.apply(t);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> withException(
+            BiFunction<T, U, R> f) {
+        return (t, u) -> f.apply(t, u);
+    }
+
 }

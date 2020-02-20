@@ -15,7 +15,7 @@ import mytools.function.SupplierWithException;
 
 /**
  * This interface contains methods which expose functionality of different
- * {@link cl.core.decorator.DecoratorWithException} implementations.
+ * {@link cl.core.decorator.ExceptionHidingDecorator} implementations.
  *
  * <p>
  * There are two groups of methods.

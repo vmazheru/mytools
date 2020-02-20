@@ -2,10 +2,10 @@ package mytools.function.decorator.retry;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import mytools.function.decorator.Decorator;
+import mytools.function.BiFunctionWithException;
+import mytools.function.decorator.DecoratorWithException;
 import mytools.util.thread.Threads;
 
 /**
@@ -27,7 +27,7 @@ import mytools.util.thread.Threads;
  *
  * @see RetryPolicy
  */
-final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
+final class RetryDecorator<T,U,R> implements DecoratorWithException<T,U,R> {
 
     private final RetryPolicy retryPolicy;
     private final List<Class<? extends Exception>> exceptionClasses;
@@ -78,7 +78,7 @@ final class RetryDecorator<T,U,R> implements Decorator<T,U,R> {
      * </ol>
      */
     @Override
-    public BiFunction<T, U, R> decorate(BiFunction<T, U, R> f) {
+    public BiFunctionWithException<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {
         return (t, u) -> {
             while (true) {
                 try {

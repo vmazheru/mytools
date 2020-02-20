@@ -1,5 +1,5 @@
 module mytools.decorator.retry {
-    requires mytools.function;
+    requires transitive mytools.function;
     requires mytools.util;
     exports mytools.function.decorator.retry;
 }
