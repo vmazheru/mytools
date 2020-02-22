@@ -7,7 +7,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import mytools.function.BiConsumerWithException;
+import mytools.function.ConsumerWithException;
 import mytools.function.RunnableWithException;
+import mytools.function.SupplierWithException;
 
 
 /**
@@ -141,304 +144,314 @@ public interface RetryDecorators {
 
     // -------------- Supplier ----------------- //
 
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code Supplier}.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     * @return           {@code Supplier} which will retry in case of an error
-     */
     static <R> Supplier<R> retried(int numRetries, long sleep, Supplier<R> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     * @return {@code Supplier} which will retry in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p, Supplier<R> f) {
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
+            Supplier<R> f) {
         return retried(p, null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute retries
-     * @param f                 code to retry
-     * @return                  {@code Supplier} which retries in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses, Supplier<R> f) {
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Supplier<R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p           retry policy
-     * @param beforeSleep code to execute before going to sleep
-     * @param f           code to retry
-     * @return            {@code Supplier} which will retry in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Supplier<R> f) {
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Supplier<R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after sleeping
-     * @return              {@code Supplier} which will retry in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p,
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
             Consumer<Exception> beforeSleep,
             Supplier<R> f, Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p                retry policy
-     * @param exceptionClasses exception types on which to execute the retries
-     * @param beforeSleep      code to execute before sleeping
-     * @param f                code to retry
-     * @return               {@code Supplier} which retries in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p,
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep, Supplier<R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier}.
-     *
-     * @param p                  retry policy
-     * @param exceptionClasses   exception types on which to execute the retries
-     * @param beforeSleep        code to execute before sleeping
-     * @param f                  code to retry
-     * @param afterSleep         code to execute after sleeping
-     * @return             {@code Supplier} which will retry in case of an error
-     */
-    static <R> Supplier<R> retried(RetryPolicy p,
+    static <R> Supplier<R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            Supplier<R> f, Runnable afterSleep) {
+            Supplier<R> f,
+            Runnable afterSleep) {
         return new RetryDecorator<Object, Object, R>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
-
-    // -------------- Consumer ----------------- //
-
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code Consumer}.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     * @return           {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(int numRetries, long sleep, Consumer<T> f) {
-        return retried(
-                new LinearRetryPolicy(numRetries, sleep), null, null, f, null);
+    static <R> SupplierWithException<R> retriedWithException(
+            int numRetries, long sleep, SupplierWithException<R> f) {
+        return retriedWithException(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     * @return {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p, Consumer<T> f) {
-        return retried(p, null, null, f, null);
+    static <R> SupplierWithException<R> retriedWithException(
+            RetryPolicy p,
+            SupplierWithException<R> f) {
+        return retriedWithException(p, null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types for which retries happen
-     * @param f                 code to retry
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses, Consumer<T> f) {
-        return retried(p, exceptionClasses, null, f, null);
-    }
-
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p            retry policy
-     * @param beforeSleep  code to execute before going to sleep
-     * @param f            code to retry
-     * @return {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Consumer<T> f) {
-        return retried(p, null, beforeSleep, f, null);
-    }
-
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after going to sleep
-     * @return {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep,
-            Consumer<T> f, Runnable afterSleep) {
-        return retried(p, null, beforeSleep, f, afterSleep);
-    }
-
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @return {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p,
+    static <R> SupplierWithException<R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep, Consumer<T> f) {
-        return retried(p, exceptionClasses, beforeSleep, f, null);
+            SupplierWithException<R> f) {
+        return retriedWithException(p, exceptionClasses, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Consumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @param afterSleep        code to execute after sleeping
-     * @return {@code Consumer} which will retry in case of an error
-     */
-    static <T> Consumer<T> retried(RetryPolicy p,
+    static <R> SupplierWithException<R> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R> f) {
+        return retriedWithException(p, null, beforeSleep, f, null);
+    }
+
+    static <R> SupplierWithException<R> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R> f,
+            Runnable afterSleep) {
+        return retriedWithException(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <R> SupplierWithException<R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            Consumer<T> f, Runnable afterSleep) {
-        return new RetryDecorator<T, Object, Object>(
+            SupplierWithException<R> f) {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <R> SupplierWithException<R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<Object, Object, R>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
+    // -------------- Consumer ----------------- //
 
-    // -------------- BiConsumer ----------------- //
-
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     * @return           {@code BiConsumer} which will retry in case of an error
-     */
-    static <T,U> BiConsumer<T,U> retried(
-            int numRetries, long sleep, BiConsumer<T,U> f) {
+    static <T> Consumer<T> retried(int numRetries, long sleep, Consumer<T> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(RetryPolicy p, BiConsumer<T, U> f) {
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
+            Consumer<T> f) {
         return retried(p, null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types for which retries happen
-     * @param f                 code to retry
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(
-            RetryPolicy p, List<Class<? extends Exception>> exceptionClasses,
-            BiConsumer<T, U> f) {
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<T> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p            retry policy
-     * @param beforeSleep  code to execute before going to sleep
-     * @param f            code to retry
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, BiConsumer<T, U> f) {
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Consumer<T> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after going to sleep
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, BiConsumer<T, U> f,
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Consumer<T> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(RetryPolicy p,
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep, BiConsumer<T, U> f) {
+            Consumer<Exception> beforeSleep,
+            Consumer<T> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiConsumer}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @param afterSleep        code to execute after sleeping
-     * @return {@code BiConsumer} which will retry in case of an error
-     */
-    static <T, U> BiConsumer<T, U> retried(RetryPolicy p,
+    static <T> Consumer<T> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            BiConsumer<T, U> f, Runnable afterSleep) {
+            Consumer<T> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<T, Object, Object>(
+                p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
+    }
+
+    static <T> ConsumerWithException<T> retried(
+            int numRetries, long sleep, ConsumerWithException<T> f) {
+        return retriedWithException(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            ConsumerWithException<T> f) {
+        return retriedWithException(p, null, null, f, null);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            ConsumerWithException<T> f) {
+        return retriedWithException(p, exceptionClasses, null, f, null);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            ConsumerWithException<T> f) {
+        return retriedWithException(p, null, beforeSleep, f, null);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            ConsumerWithException<T> f,
+            Runnable afterSleep) {
+        return retriedWithException(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            ConsumerWithException<T> f) {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <T> ConsumerWithException<T> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            ConsumerWithException<T> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<T, Object, Object>(
+                p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
+    }
+
+    // -------------- BiConsumer ----------------- //
+
+    static <T,U> BiConsumer<T, U> retried(
+            int numRetries, long sleep, BiConsumer<T, U> f) {
+        return retried(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            BiConsumer<T, U> f) {
+        return retried(p, null, null, f, null);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            BiConsumer<T, U> f) {
+        return retried(p, exceptionClasses, null, f, null);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiConsumer<T, U> f) {
+        return retried(p, null, beforeSleep, f, null);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiConsumer<T, U> f,
+            Runnable afterSleep) {
+        return retried(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiConsumer<T, U> f) {
+        return retried(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <T, U> BiConsumer<T, U> retried(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiConsumer<T, U> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<T, U, Object>(
+                p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
+    }
+
+    static <T,U> BiConsumerWithException<T,U> retriedWithException(
+            int numRetries, long sleep, BiConsumerWithException<T, U> f) {
+        return retriedWithException(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            BiConsumerWithException<T, U> f) {
+        return retriedWithException(p, null, null, f, null);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            BiConsumerWithException<T, U> f) {
+        return retriedWithException(p, exceptionClasses, null, f, null);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiConsumerWithException<T, U> f) {
+        return retriedWithException(p, null, beforeSleep, f, null);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiConsumerWithException<T, U> f,
+            Runnable afterSleep) {
+        return retriedWithException(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiConsumerWithException<T, U> f) {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiConsumerWithException<T, U> f,
+            Runnable afterSleep) {
         return new RetryDecorator<T, U, Object>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
