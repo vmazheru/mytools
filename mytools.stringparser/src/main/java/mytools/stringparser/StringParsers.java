@@ -170,7 +170,7 @@ public final class StringParsers {
     public static <T> StringParser<T> get(Class<T> klass) {
         synchronized (PARSERS) {
             @SuppressWarnings("unchecked")
-            StringParser<T> p = (StringParser<T>)PARSERS.get(klass);
+            StringParser<T> p = (StringParser<T>) PARSERS.get(klass);
             return p;
         }
     }

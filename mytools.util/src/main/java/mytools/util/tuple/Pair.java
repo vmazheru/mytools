@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class Pair<T,U> {
+public final class Pair<T, U> {
 
     private final T first;
     private final U second;
@@ -34,7 +34,7 @@ public final class Pair<T,U> {
         return new Object[] {first, second};
     }
 
-    public static <T> List<T> asList(Pair<T,T> pair) {
+    public static <T> List<T> asList(Pair<T, T> pair) {
         return Arrays.<T>asList(pair._1(), pair._2());
     }
 

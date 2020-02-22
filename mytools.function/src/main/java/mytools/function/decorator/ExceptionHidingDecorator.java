@@ -27,7 +27,7 @@ import mytools.function.SupplierWithException;
  *
  * @see Decorator
  */
-public interface ExceptionHidingDecorator<T,U,R> {
+public interface ExceptionHidingDecorator<T, U, R> {
 
     default Runnable decorate(RunnableWithException f) {
         return toR(decorate(toBF(f)));

@@ -9,7 +9,8 @@ import java.lang.reflect.InvocationTargetException;
  * given as constructor parameter, or of RuntimeException/UncheckedIOException
  * class
  */
-final class Uncheck <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
+final class Uncheck <T, U, R>
+    extends AbstractExceptionHandlingDecorator<T, U, R> {
 
     private final Class<? extends RuntimeException> exceptionClass;
 

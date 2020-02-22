@@ -8,7 +8,7 @@ public class ThreadsTest {
 
     @Test
     public void interruptSleepingThread() throws Exception {
-        long sleepTime = 5000;
+        final int sleepTime = 5000;
         Thread t = new Thread(() -> Threads.sleep(sleepTime));
         long start = System.currentTimeMillis();
         t.start();

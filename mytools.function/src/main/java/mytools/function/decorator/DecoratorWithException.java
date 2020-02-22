@@ -21,7 +21,7 @@ import mytools.function.SupplierWithException;
 /**
  * Add decorating function with exceptions to the original {@link Decorator}
  */
-public interface DecoratorWithException<T,U,R> extends Decorator<T,U,R> {
+public interface DecoratorWithException<T, U, R> extends Decorator<T, U, R> {
 
     default RunnableWithException decorate(RunnableWithException f) {
         return toR(decorate(toBF(f)));

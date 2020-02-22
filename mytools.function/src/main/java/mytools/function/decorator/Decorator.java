@@ -68,7 +68,7 @@ import java.util.function.Supplier;
  * </pre>
  *
  */
-public interface Decorator<T,U,R> {
+public interface Decorator<T, U, R> {
 
     default Runnable decorate(Runnable f) {
         return toR(decorate(toBF(f)));

@@ -6,7 +6,7 @@ import java.util.stream.Stream;
  * Transform a function which throws exception into a function which returns
  * null in cases when exception is thrown.
  */
-final class Safe <T,U,R> extends AbstractExceptionHandlingDecorator<T,U,R> {
+final class Safe <T, U, R> extends AbstractExceptionHandlingDecorator<T, U, R> {
 
     private final Class<? extends Exception>[] catchExceptions;
 

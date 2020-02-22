@@ -27,7 +27,7 @@ import mytools.util.thread.Threads;
  *
  * @see RetryPolicy
  */
-final class RetryDecorator<T,U,R> implements DecoratorWithException<T,U,R> {
+final class RetryDecorator<T, U, R> implements DecoratorWithException<T, U, R> {
 
     private final RetryPolicy retryPolicy;
     private final List<Class<? extends Exception>> exceptionClasses;
@@ -78,7 +78,8 @@ final class RetryDecorator<T,U,R> implements DecoratorWithException<T,U,R> {
      * </ol>
      */
     @Override
-    public BiFunctionWithException<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {
+    public BiFunctionWithException<T, U, R> decorate(
+            BiFunctionWithException<T, U, R> f) {
         return (t, u) -> {
             while (true) {
                 try {

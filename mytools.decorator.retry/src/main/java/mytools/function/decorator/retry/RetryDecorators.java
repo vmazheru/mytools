@@ -352,7 +352,7 @@ public interface RetryDecorators {
 
     // -------------- BiConsumer ----------------- //
 
-    static <T,U> BiConsumer<T, U> retried(
+    static <T, U> BiConsumer<T, U> retried(
             int numRetries, long sleep, BiConsumer<T, U> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
@@ -404,7 +404,7 @@ public interface RetryDecorators {
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
-    static <T,U> BiConsumerWithException<T,U> retriedWithException(
+    static <T, U> BiConsumerWithException<T, U> retriedWithException(
             int numRetries, long sleep, BiConsumerWithException<T, U> f) {
         return retriedWithException(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
@@ -467,8 +467,8 @@ public interface RetryDecorators {
      * @param f          code to retry
      * @return           {@code Function} which will retry in case of an error
      */
-    static <T,R> Function<T,R> retried(
-            int numRetries, long sleep, Function<T,R> f) {
+    static <T, R> Function<T, R> retried(
+            int numRetries, long sleep, Function<T, R> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }
@@ -570,8 +570,8 @@ public interface RetryDecorators {
      * @param f          code to retry
      * @return           {@code BiFunction} which will retry in case of an error
      */
-    static <T,U,R> BiFunction<T,U,R> retried(
-            int numRetries, long sleep, BiFunction<T,U,R> f) {
+    static <T, U, R> BiFunction<T, U, R> retried(
+            int numRetries, long sleep, BiFunction<T, U, R> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }

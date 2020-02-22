@@ -102,34 +102,34 @@ public interface ExceptionDecorators {
         return new Uncheck<T, Object, Object>(exceptionClass).decorate(f);
     }
 
-    static <T,U> BiConsumer<T,U> unchecked(BiConsumerWithException<T,U> f) {
+    static <T, U> BiConsumer<T, U> unchecked(BiConsumerWithException<T, U> f) {
         return new Uncheck<T, U, Object>().decorate(f);
     }
 
-    static <T,U> BiConsumer<T,U> unchecked(
+    static <T, U> BiConsumer<T, U> unchecked(
             Class<? extends RuntimeException> exceptionClass,
-            BiConsumerWithException<T,U> f) {
+            BiConsumerWithException<T, U> f) {
         return new Uncheck<T, U, Object>(exceptionClass).decorate(f);
     }
 
-    static <T,R> Function<T,R> unchecked(FunctionWithException<T,R> f) {
+    static <T, R> Function<T, R> unchecked(FunctionWithException<T, R> f) {
         return new Uncheck<T, Object, R>().decorate(f);
     }
 
-    static <T,R> Function<T,R> unchecked(
+    static <T, R> Function<T, R> unchecked(
             Class<? extends RuntimeException> exceptionClass,
-            FunctionWithException<T,R> f) {
+            FunctionWithException<T, R> f) {
         return new Uncheck<T, Object, R>(exceptionClass).decorate(f);
     }
 
-    static <T,U,R> BiFunction<T,U,R> unchecked(
-            BiFunctionWithException<T,U,R> f) {
+    static <T, U, R> BiFunction<T, U, R> unchecked(
+            BiFunctionWithException<T, U, R> f) {
         return new Uncheck<T, U, R>().decorate(f);
     }
 
-    static <T,U,R> BiFunction<T,U,R> unchecked(
+    static <T, U, R> BiFunction<T, U, R> unchecked(
             Class<? extends RuntimeException> exceptionClass,
-            BiFunctionWithException<T,U,R> f) {
+            BiFunctionWithException<T, U, R> f) {
         return new Uncheck<T, U, R>(exceptionClass).decorate(f);
     }
 
@@ -164,24 +164,25 @@ public interface ExceptionDecorators {
         return new Safe<Object, Object, R>(exceptions).decorate(f);
     }
 
-    static <T,R> Function<T,R> safe(FunctionWithException<T,R> f) {
+    static <T, R> Function<T, R> safe(FunctionWithException<T, R> f) {
         return new Safe<T, Object, R>().decorate(f);
     }
 
     @SafeVarargs
-    static <T,R> Function<T,R> safe(
-            FunctionWithException<T,R> f,
+    static <T, R> Function<T, R> safe(
+            FunctionWithException<T, R> f,
             Class<? extends Exception>... exceptions) {
         return new Safe<T, Object, R>(exceptions).decorate(f);
     }
 
-    static <T,U,R> BiFunction<T,U,R> safe(BiFunctionWithException<T,U,R> f) {
+    static <T, U, R> BiFunction<T, U, R> safe(
+            BiFunctionWithException<T, U, R> f) {
         return new Safe<T, U, R>().decorate(f);
     }
 
     @SafeVarargs
-    static <T,U,R> BiFunction<T,U,R> safe(
-            BiFunctionWithException<T,U,R> f,
+    static <T, U, R> BiFunction<T, U, R> safe(
+            BiFunctionWithException<T, U, R> f,
             Class<? extends Exception>... exceptions) {
         return new Safe<T, U, R>(exceptions).decorate(f);
     }

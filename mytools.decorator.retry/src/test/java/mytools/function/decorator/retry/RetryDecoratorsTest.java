@@ -27,7 +27,7 @@ public class RetryDecoratorsTest {
     @Test
     public void run3TimesOnError() {
         Counter c = new Counter();
-        RetryDecorator<?,?,?> d = new RetryDecorator<>(
+        RetryDecorator<?, ?, ?> d = new RetryDecorator<>(
                 p, null, null, () -> c.increment());
         assertThrows(RuntimeException.class,
                 () -> d.decorate(runnableWithRuntimeException).run());
@@ -36,7 +36,7 @@ public class RetryDecoratorsTest {
 
     @Test
     public void executionTimeDictatedByRetryPolicy() {
-        RetryDecorator<?,?,?> d = new RetryDecorator<>(p, null, null, null);
+        RetryDecorator<?, ?, ?> d = new RetryDecorator<>(p, null, null, null);
         long start = System.currentTimeMillis();
         assertThrows(RuntimeException.class,
                 () -> d.decorate(runnableWithRuntimeException).run());
@@ -48,7 +48,7 @@ public class RetryDecoratorsTest {
     @Test
     public void retryOnlyOnSpecifiedExceptionTypes() {
         Counter c = new Counter();
-        RetryDecorator<?,?,?> d = new RetryDecorator<>(
+        RetryDecorator<?, ?, ?> d = new RetryDecorator<>(
                 p, Arrays.asList(IOException.class, NullPointerException.class),
                 null, () -> c.increment());
         assertThrows(RuntimeException.class,

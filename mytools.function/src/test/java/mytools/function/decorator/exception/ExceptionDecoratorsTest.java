@@ -25,31 +25,40 @@ public class ExceptionDecoratorsTest {
 
     @Test
     public void testUnchecked() {
-        testUnchecked(1, () -> unchecked(Functions.runnable()).run());
-        testUnchecked(2, () -> uncheck(Functions.runnable()));
-        testUnchecked(3, () -> unchecked(Functions.supplier()).get());
-        testUnchecked(4, () -> uncheck(Functions.supplier()));
-        testUnchecked(5, () -> unchecked(Functions.consumer()).accept(1));
-        testUnchecked(6, () -> unchecked(Functions.biConsumer()).accept(1,2));
-        testUnchecked(7, () -> unchecked(Functions.function()).apply(1));
-        testUnchecked(8, () -> unchecked(Functions.biFunction()).apply(1,2));
+        int expectedCounterValue = 0;
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.runnable()).run());
+        testUnchecked(++expectedCounterValue, () -> uncheck(
+                Functions.runnable()));
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.supplier()).get());
+        testUnchecked(++expectedCounterValue, () -> uncheck(
+                Functions.supplier()));
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.consumer()).accept(1));
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.biConsumer()).accept(1, 2));
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.function()).apply(1));
+        testUnchecked(++expectedCounterValue, () -> unchecked(
+                Functions.biFunction()).apply(1, 2));
 
-        testUncheckedWithMyException(9, () -> unchecked(
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
                 MyRuntimeException.class, Functions.runnable()).run());
-        testUncheckedWithMyException(10, () -> uncheck(
+        testUncheckedWithMyException(++expectedCounterValue, () -> uncheck(
                 MyRuntimeException.class, Functions.runnable()));
-        testUncheckedWithMyException(11, () -> unchecked(
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
                 MyRuntimeException.class, Functions.supplier()).get());
-        testUncheckedWithMyException(12, () -> uncheck(
+        testUncheckedWithMyException(++expectedCounterValue, () -> uncheck(
                 MyRuntimeException.class, Functions.supplier()));
-        testUncheckedWithMyException(13, () -> unchecked(
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
                 MyRuntimeException.class, Functions.consumer()).accept(1));
-        testUncheckedWithMyException(14, () -> unchecked(
-                MyRuntimeException.class, Functions.biConsumer()).accept(1,2));
-        testUncheckedWithMyException(15, () -> unchecked(
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
+                MyRuntimeException.class, Functions.biConsumer()).accept(1, 2));
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
                 MyRuntimeException.class, Functions.function()).apply(1));
-        testUncheckedWithMyException(16, () -> unchecked(
-                MyRuntimeException.class, Functions.biFunction()).apply(1,2));
+        testUncheckedWithMyException(++expectedCounterValue, () -> unchecked(
+                MyRuntimeException.class, Functions.biFunction()).apply(1, 2));
     }
 
     @Test
@@ -75,7 +84,7 @@ public class ExceptionDecoratorsTest {
         assertNull(safe((Integer i, Integer j) -> {
             throwMyException();
             return i * j;
-        }).apply(1,2));
+        }).apply(1, 2));
 
         // test with exception, which is thrown by the function
         // it should be caught
@@ -98,7 +107,7 @@ public class ExceptionDecoratorsTest {
         assertNull(safe((Integer i, Integer j) -> {
             throwMyException();
             return i * j;
-        }, MyRuntimeException.class, IllegalStateException.class).apply(1,2));
+        }, MyRuntimeException.class, IllegalStateException.class).apply(1, 2));
 
         // test with exception, which is not thrown by the function
         // it should be re-thrown
@@ -134,7 +143,7 @@ public class ExceptionDecoratorsTest {
             safe((Integer i, Integer j) -> {
                 throwMyException();
                 return i * j;
-            }, IllegalStateException.class).apply(1,2);
+            }, IllegalStateException.class).apply(1, 2);
         } catch (@SuppressWarnings("unused") MyRuntimeException e) {
             //ok
         }

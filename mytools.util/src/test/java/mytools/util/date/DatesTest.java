@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 
 public class DatesTest {
 
+    private static final int NUM_MILLIS = 1000;
+
     @Test
     public void convertDates() {
         // Get instant for the beginning of the day
@@ -25,7 +27,7 @@ public class DatesTest {
         LocalDateTime localDateTime = LocalDateTime.now(clock);
         LocalDate localDate = LocalDate.now(clock);
         Date date = Date.from(i);
-        long epochSeconds = date.getTime() / 1000;
+        long epochSeconds = date.getTime() / NUM_MILLIS;
 
         // Verify that Dates class methods convert them to each other correctly
         assertEquals(date, Dates.date(localDateTime));

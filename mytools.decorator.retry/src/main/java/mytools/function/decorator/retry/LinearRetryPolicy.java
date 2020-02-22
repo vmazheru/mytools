@@ -8,7 +8,7 @@ package mytools.function.decorator.retry;
  * This retry policy maintains an internal retry counter, and cannot be used
  * more than once.
  */
-public class LinearRetryPolicy implements RetryPolicy {
+public final class LinearRetryPolicy implements RetryPolicy {
 
     private final int numRetries;
     private final long sleepTime;

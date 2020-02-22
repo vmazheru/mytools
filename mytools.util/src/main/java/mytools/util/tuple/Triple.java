@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public final class Triple<T,U,R> {
+public final class Triple<T, U, R> {
 
     private final T first;
     private final U second;
@@ -44,7 +44,7 @@ public final class Triple<T,U,R> {
         return new Object[] {first, second, third};
     }
 
-    public static <T> List<T> asList(Triple<T,T,T> t) {
+    public static <T> List<T> asList(Triple<T, T, T> t) {
         return Arrays.<T>asList(t._1(), t._2(), t._3());
     }
 

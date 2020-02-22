@@ -19,7 +19,7 @@ public class DecoratorTest {
     /*
      * Simple decorator which counts how many times the function was executed.
      */
-    private static class CountDecorator<T,U,R> implements Decorator<T,U,R> {
+    private static class CountDecorator<T, U, R> implements Decorator<T, U, R> {
 
         private Counter counter;
 
@@ -36,7 +36,7 @@ public class DecoratorTest {
          */
         @Override
         public BiFunction<T, U, R> decorate(BiFunction<T, U, R> f) {
-            return (t,u) -> {
+            return (t, u) -> {
                 counter.increment();
                 return f.apply(t, u);
             };
@@ -54,7 +54,7 @@ public class DecoratorTest {
 
     @Test
     public void testSimpleDecorator() {
-        int times = 7;
+        final int times = 7;
         Counter counter = new Counter();
 
         IntStream.range(0, times).forEach(i -> {

@@ -7,8 +7,8 @@ import java.util.function.BiFunction;
 import mytools.function.BiFunctionWithException;
 import mytools.function.decorator.ExceptionHidingDecorator;
 
-abstract class AbstractExceptionHandlingDecorator<T,U,R>
-    implements ExceptionHidingDecorator<T,U,R> {
+abstract class AbstractExceptionHandlingDecorator<T, U, R>
+    implements ExceptionHidingDecorator<T, U, R> {
 
     @Override
     public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {
@@ -25,9 +25,9 @@ abstract class AbstractExceptionHandlingDecorator<T,U,R>
 
     static RuntimeException toUnchecked(Exception e) {
         if (e instanceof RuntimeException) {
-            return (RuntimeException)e;
+            return (RuntimeException) e;
         } else if (e instanceof IOException) {
-            return new UncheckedIOException((IOException)e);
+            return new UncheckedIOException((IOException) e);
         }
         return new RuntimeException(e);
     }
