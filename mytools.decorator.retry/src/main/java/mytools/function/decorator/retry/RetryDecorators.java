@@ -8,7 +8,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import mytools.function.BiConsumerWithException;
+import mytools.function.BiFunctionWithException;
 import mytools.function.ConsumerWithException;
+import mytools.function.FunctionWithException;
 import mytools.function.RunnableWithException;
 import mytools.function.SupplierWithException;
 
@@ -459,102 +461,106 @@ public interface RetryDecorators {
 
     // -------------- Function ----------------- //
 
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code Function}.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     * @return           {@code Function} which will retry in case of an error
-     */
     static <T, R> Function<T, R> retried(
             int numRetries, long sleep, Function<T, R> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     * @return {@code Function} which will retry in case of an error
-     */
-    static <T, R> Function<T, R> retried(RetryPolicy p, Function<T, R> f) {
+    static <T, R> Function<T, R> retried(
+            RetryPolicy p,
+            Function<T, R> f) {
         return retried(p, null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types for which retries happen
-     * @param f                 code to retry
-     * @return {@code Function} which will retry in case of an error
-     */
-    static <T, R> Function<T, R> retried(RetryPolicy p,
+    static <T, R> Function<T, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Function<T, R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p            retry policy
-     * @param beforeSleep  code to execute before going to sleep
-     * @param f            code to retry
-     * @return {@code Function} which will retry in case of an error
-     */
     static <T, R> Function<T, R> retried(
-            RetryPolicy p, Consumer<Exception> beforeSleep, Function<T, R> f) {
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Function<T, R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after going to sleep
-     * @return {@code Function} which will retry in case of an error
-     */
-    static <T, R> Function<T, R> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Function<T, R> f,
+    static <T, R> Function<T, R> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Function<T, R> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @return {@code Function} which will retry in case of an error
-     */
-    static <T, R> Function<T, R> retried(RetryPolicy p,
+    static <T, R> Function<T, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep, Function<T, R> f) {
+            Consumer<Exception> beforeSleep,
+            Function<T, R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Function}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @param afterSleep        code to execute after sleeping
-     * @return {@code Function} which will retry in case of an error
-     */
-    static <T, R> Function<T, R> retried(RetryPolicy p,
+    static <T, R> Function<T, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            Function<T, R> f, Runnable afterSleep) {
+            Function<T, R> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<T, Object, R>(
+                p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            int numRetries, long sleep, FunctionWithException<T, R> f) {
+        return retriedWithException(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            FunctionWithException<T, R> f) {
+        return retriedWithException(p, null, null, f, null);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            FunctionWithException<T, R> f) {
+        return retriedWithException(p, exceptionClasses, null, f, null);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            FunctionWithException<T, R> f) {
+        return retriedWithException(p, null, beforeSleep, f, null);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            FunctionWithException<T, R> f,
+            Runnable afterSleep) {
+        return retriedWithException(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            FunctionWithException<T, R> f) {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <T, R> FunctionWithException<T, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            FunctionWithException<T, R> f,
+            Runnable afterSleep) {
         return new RetryDecorator<T, Object, R>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
@@ -562,104 +568,106 @@ public interface RetryDecorators {
 
     // -------------- BiFunction ----------------- //
 
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code BiFunction}.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     * @return           {@code BiFunction} which will retry in case of an error
-     */
     static <T, U, R> BiFunction<T, U, R> retried(
             int numRetries, long sleep, BiFunction<T, U, R> f) {
         return retried(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     * @return {@code BiFunction} which will retry in case of an error
-     */
     static <T, U, R> BiFunction<T, U, R> retried(
-            RetryPolicy p, BiFunction<T, U, R> f) {
+            RetryPolicy p,
+            BiFunction<T, U, R> f) {
         return retried(p, null, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types for whith retries happen
-     * @param f                 code to retry
-     * @return {@code BiFunction} which will retry in case of an error
-     */
-    static <T, U, R> BiFunction<T, U, R> retried(RetryPolicy p,
+    static <T, U, R> BiFunction<T, U, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             BiFunction<T, U, R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p            retry policy
-     * @param beforeSleep  code to execute before going to sleep
-     * @param f            code to retry
-     * @return {@code BiFunction} which will retry in case of an error
-     */
-    static <T, U, R> BiFunction<T, U, R> retried(RetryPolicy p,
+    static <T, U, R> BiFunction<T, U, R> retried(
+            RetryPolicy p,
             Consumer<Exception> beforeSleep,
             BiFunction<T, U, R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after going to sleep
-     * @return {@code BiFunction} which will retry in case of an error
-     */
-    static <T, U, R> BiFunction<T, U, R> retried(RetryPolicy p,
-            Consumer<Exception> beforeSleep, BiFunction<T, U, R> f,
+    static <T, U, R> BiFunction<T, U, R> retried(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiFunction<T, U, R> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @return {@code BiFunction} which will retry in case of an error
-     */
-    static <T, U, R> BiFunction<T, U, R> retried(RetryPolicy p,
+    static <T, U, R> BiFunction<T, U, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep, BiFunction<T, U, R> f) {
+            Consumer<Exception> beforeSleep,
+            BiFunction<T, U, R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code BiFunction}.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @param afterSleep        code to execute after sleeping
-     * @return {@code BiFunction} which will retry in case of an error
-     */
-    static <T, U, R> BiFunction<T, U, R> retried(RetryPolicy p,
+    static <T, U, R> BiFunction<T, U, R> retried(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            BiFunction<T, U, R> f, Runnable afterSleep) {
+            BiFunction<T, U, R> f,
+            Runnable afterSleep) {
+        return new RetryDecorator<T, U, R>(
+                p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            int numRetries, long sleep, BiFunctionWithException<T, U, R> f) {
+        return retriedWithException(new LinearRetryPolicy(
+                numRetries, sleep), null, null, f, null);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            BiFunctionWithException<T, U, R> f) {
+        return retriedWithException(p, null, null, f, null);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            BiFunctionWithException<T, U, R> f) {
+        return retriedWithException(p, exceptionClasses, null, f, null);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiFunctionWithException<T, U, R> f) {
+        return retriedWithException(p, null, beforeSleep, f, null);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            BiFunctionWithException<T, U, R> f,
+            Runnable afterSleep) {
+        return retriedWithException(p, null, beforeSleep, f, afterSleep);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiFunctionWithException<T, U, R> f) {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
+    }
+
+    static <T, U, R> BiFunctionWithException<T, U, R> retriedWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            BiFunctionWithException<T, U, R> f,
+            Runnable afterSleep) {
         return new RetryDecorator<T, U, R>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
@@ -669,92 +677,52 @@ public interface RetryDecorators {
 
     // -------------- Runnable ----------------- //
 
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     */
     static void retry(int numRetries, long sleep, Runnable f) {
         retried(numRetries, sleep, f).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     */
-    static void retry(RetryPolicy p, Runnable f) {
+    static void retry(
+            RetryPolicy p,
+            Runnable f) {
         retried(p, f).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types for which retries happen
-     * @param f                 code to retry
-     */
-    static void retry(RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses, Runnable f) {
+    static void retry(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Runnable f) {
         retried(p, exceptionClasses, f).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     */
-    static void retry(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Runnable f) {
+    static void retry(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Runnable f) {
         retried(p, beforeSleep, f).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after going to sleep
-     */
-    static void retry(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Runnable f, Runnable afterSleep) {
+    static void retry(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Runnable f,
+            Runnable afterSleep) {
         retried(p, beforeSleep, f, afterSleep).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     */
-    static void retry(RetryPolicy p,
+    static void retry(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
             Runnable f) {
         retried(p, exceptionClasses, beforeSleep, f).run();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Runnable} and execute it.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute the retries
-     * @param beforeSleep       code to execute before going to sleep
-     * @param f                 code to retry
-     * @param afterSleep        code to execute after sleeping
-     */
-    static void retry(RetryPolicy p,
+    static void retry(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            Runnable f, Runnable afterSleep) {
+            Runnable f,
+            Runnable afterSleep) {
         retried(p, exceptionClasses, beforeSleep, f, afterSleep).run();
     }
 
