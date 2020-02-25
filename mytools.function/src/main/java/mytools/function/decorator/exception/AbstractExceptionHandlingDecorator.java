@@ -7,11 +7,11 @@ import java.util.function.BiFunction;
 import mytools.function.BiFunctionWithException;
 import mytools.function.decorator.ExceptionHidingDecorator;
 
-abstract class AbstractExceptionHandlingDecorator<T, U, R>
-    implements ExceptionHidingDecorator<T, U, R> {
+abstract class AbstractExceptionHandlingDecorator<T, U, R, E extends Exception>
+    implements ExceptionHidingDecorator<T, U, R, E> {
 
     @Override
-    public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f) {
+    public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R, E> f) {
         return (t, u) -> {
             try {
                 return f.apply(t, u);

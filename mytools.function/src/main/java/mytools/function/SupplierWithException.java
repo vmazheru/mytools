@@ -1,6 +1,6 @@
 package mytools.function;
 
 @FunctionalInterface
-public interface SupplierWithException<R> {
-    R get() throws Exception;
+public interface SupplierWithException<R, E extends Exception> {
+    R get() throws E;
 }

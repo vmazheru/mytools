@@ -201,14 +201,14 @@ final class Functions {
         return counter;
     }
 
-    static RunnableWithException runnable() {
+    static RunnableWithException<Exception> runnable() {
         return () ->  {
             makeSideEffect();
             throwIt();
         };
     }
 
-    static SupplierWithException<Integer> supplier() {
+    static SupplierWithException<Integer, Exception> supplier() {
         return () ->  {
             makeSideEffect();
             throwIt();
@@ -216,21 +216,21 @@ final class Functions {
         };
     }
 
-    static ConsumerWithException<Integer> consumer() {
+    static ConsumerWithException<Integer, Exception> consumer() {
         return i -> {
             makeSideEffect();
             throwIt();
         };
     }
 
-    static BiConsumerWithException<Integer, Integer> biConsumer() {
+    static BiConsumerWithException<Integer, Integer, Exception> biConsumer() {
         return (list, i) -> {
             makeSideEffect();
             throwIt();
         };
     }
 
-    static FunctionWithException<Integer, Integer> function() {
+    static FunctionWithException<Integer, Integer, Exception> function() {
         return i -> {
             makeSideEffect();
             throwIt();
@@ -238,7 +238,8 @@ final class Functions {
         };
     }
 
-    static BiFunctionWithException<Integer, Integer, Integer> biFunction() {
+    static BiFunctionWithException<Integer, Integer, Integer, Exception>
+    biFunction() {
         return (a, b) -> {
             makeSideEffect();
             throwIt();

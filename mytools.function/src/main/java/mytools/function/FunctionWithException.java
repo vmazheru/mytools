@@ -1,6 +1,6 @@
 package mytools.function;
 
 @FunctionalInterface
-public interface FunctionWithException<T, R> {
-    R apply(T t) throws Exception;
+public interface FunctionWithException<T, R, E extends Exception> {
+    R apply(T t) throws E;
 }

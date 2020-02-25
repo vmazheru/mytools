@@ -36,7 +36,8 @@ public interface Conversions {
      * into a {@link RunnableWithException}.
      * The supplier's return value will be discarded.
      */
-    static RunnableWithException toR(SupplierWithException<?> s) {
+    static <E extends Exception> RunnableWithException<E> toR(
+            SupplierWithException<?, E> s) {
         return () -> s.get();
     }
 
@@ -53,7 +54,8 @@ public interface Conversions {
      * into a {@link RunnableWithException}.
      * Null will be passed to the consumer as an argument.
      */
-    static RunnableWithException toR(ConsumerWithException<?> c) {
+    static <E extends Exception> RunnableWithException<E> toR(
+            ConsumerWithException<?, E> c) {
         return () -> c.accept(null);
     }
 
@@ -70,7 +72,8 @@ public interface Conversions {
      * into a {@link RunnableWithException}.
      * Null values will be passed to the consumer as arguments.
      */
-    static RunnableWithException toR(BiConsumerWithException<?, ?> c) {
+    static <E extends Exception> RunnableWithException<E> toR(
+            BiConsumerWithException<?, ?, E> c) {
         return () -> c.accept(null, null);
     }
 
@@ -89,7 +92,8 @@ public interface Conversions {
      * Null will be passed to the function as an argument and
      * its return value will be discarded.
      */
-    static RunnableWithException toR(FunctionWithException<?, ?> f) {
+    static <E extends Exception> RunnableWithException<E> toR(
+            FunctionWithException<?, ?, E> f) {
         return () -> f.apply(null);
     }
 
@@ -108,7 +112,8 @@ public interface Conversions {
      * Null values will be passed to the function as arguments and
      * its return value will be discarded.
      */
-    static RunnableWithException toR(BiFunctionWithException<?, ?, ?> f) {
+    static <E extends Exception> RunnableWithException<E> toR(
+            BiFunctionWithException<?, ?, ?, E> f) {
         return () -> f.apply(null, null);
     }
 
@@ -130,7 +135,8 @@ public interface Conversions {
      * into a {@link SupplierWithException}.
      * The return value of the supplier will be null.
      */
-    static <R> SupplierWithException<R> toS(RunnableWithException r) {
+    static <R, E extends Exception> SupplierWithException<R, E> toS(
+            RunnableWithException<E> r) {
         return () -> {
             r.run();
             return null;
@@ -155,7 +161,8 @@ public interface Conversions {
      * The value passed to the consumer will be null.
      * The return value of the supplier will be null.
      */
-    static <R> SupplierWithException<R> toS(ConsumerWithException<?> c) {
+    static <R, E extends Exception> SupplierWithException<R, E> toS(
+            ConsumerWithException<?, E> c) {
         return () -> {
             c.accept(null);
             return null;
@@ -180,7 +187,8 @@ public interface Conversions {
      * The arguments passed to the bi-consumer will be nulls.
      * The return value of the supplier will be null.
      */
-    static <R> SupplierWithException<R> toS(BiConsumerWithException<?, ?> c) {
+    static <R, E extends Exception> SupplierWithException<R, E> toS(
+            BiConsumerWithException<?, ?, E> c) {
         return () -> {
             c.accept(null, null);
             return null;
@@ -202,7 +210,8 @@ public interface Conversions {
      * The function argument value will be null.
      * The supplier will return the value returned by the underlying function.
      */
-    static <R> SupplierWithException<R> toS(FunctionWithException<?, R> f) {
+    static <R, E extends Exception> SupplierWithException<R, E> toS(
+            FunctionWithException<?, R, E> f) {
         return () -> f.apply(null);
     }
 
@@ -221,8 +230,8 @@ public interface Conversions {
      * The function argument values will be nulls.
      * The supplier will return the value returned by the underlying function.
      */
-    static <R> SupplierWithException<R> toS(
-            BiFunctionWithException<?, ?, R> f) {
+    static <R, E extends Exception> SupplierWithException<R, E> toS(
+            BiFunctionWithException<?, ?, R, E> f) {
         return () -> f.apply(null, null);
     }
 
@@ -242,7 +251,8 @@ public interface Conversions {
      *  into a {@link ConsumerWithException}.
      *  The argument passed to the consumer will be discarded.
      */
-    static <T> ConsumerWithException<T> toC(RunnableWithException r) {
+    static <T, E extends Exception> ConsumerWithException<T, E> toC(
+            RunnableWithException<E> r) {
         return (t) -> r.run();
     }
 
@@ -261,7 +271,8 @@ public interface Conversions {
      * The argument passed to the consumer will be discarded.
      * The return value of the supplier will be discarded.
      */
-    static <T> ConsumerWithException<T> toC(SupplierWithException<?> s) {
+    static <T, E extends Exception> ConsumerWithException<T, E> toC(
+            SupplierWithException<?, E> s) {
         return (t) -> s.get();
     }
 
@@ -282,7 +293,8 @@ public interface Conversions {
      * its first argument.
      * The second bi-consumer argument will be null.
      */
-    static <T> ConsumerWithException<T> toC(BiConsumerWithException<T, ?> c) {
+    static <T, E extends Exception> ConsumerWithException<T, E> toC(
+            BiConsumerWithException<T, ?, E> c) {
         return (t) -> c.accept(t, null);
     }
 
@@ -301,7 +313,8 @@ public interface Conversions {
      * The argument passed to the consumer will be passed to the function.
      * The function return value will be discarded.
      */
-    static <T> ConsumerWithException<T> toC(FunctionWithException<T, ?> f) {
+    static <T, E extends Exception> ConsumerWithException<T, E> toC(
+            FunctionWithException<T, ?, E> f) {
         return (t) -> f.apply(t);
     }
 
@@ -324,8 +337,8 @@ public interface Conversions {
      * The second function's argument will be null.
      * The function return value will be discarded.
      */
-    static <T> ConsumerWithException<T> toC(
-            BiFunctionWithException<T, ?, ?> f) {
+    static <T, E extends Exception> ConsumerWithException<T, E> toC(
+            BiFunctionWithException<T, ?, ?, E> f) {
         return (t) -> f.apply(t, null);
     }
 
@@ -345,7 +358,8 @@ public interface Conversions {
      * into a {@link BiConsumerWithException}.
      * The consumer arguments will be discarded.
      */
-    static <T, U> BiConsumerWithException<T, U> toBC(RunnableWithException r) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E> toBC(
+            RunnableWithException<E> r) {
         return (t, u) -> r.run();
     }
 
@@ -364,8 +378,8 @@ public interface Conversions {
      * The consumer arguments will be discarded.
      * The supplier return value will be discarded.
      */
-    static <T, U> BiConsumerWithException<T, U> toBC(
-            SupplierWithException<?> s) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E> toBC(
+            SupplierWithException<?, E> s) {
         return (t, u) -> s.get();
     }
 
@@ -386,8 +400,8 @@ public interface Conversions {
      * to the consumer.
      * The second argument to the bi-consumer will be discarded.
      */
-    static <T, U> BiConsumerWithException<T, U> toBC(
-            ConsumerWithException<T> c) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E> toBC(
+            ConsumerWithException<T, E> c) {
         return (t, u) -> c.accept(t);
     }
 
@@ -410,8 +424,8 @@ public interface Conversions {
      * The second argument to the bi-consumer will be discarded.
      * The function return value will be discarded.
      */
-    static <T, U> BiConsumerWithException<T, U> toBC(
-            FunctionWithException<T, ?> f) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E> toBC(
+            FunctionWithException<T, ?, E> f) {
         return (t, u) -> f.apply(t);
     }
 
@@ -432,8 +446,8 @@ public interface Conversions {
      * to the function.
      * The function return value will be discarded.
      */
-    static <T, U> BiConsumerWithException<T, U> toBC(
-            BiFunctionWithException<T, U, ?> f) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E> toBC(
+            BiFunctionWithException<T, U, ?, E> f) {
         return (t, u) -> f.apply(t, u);
     }
 
@@ -458,7 +472,8 @@ public interface Conversions {
      * The argument passed to the function will be discarded.
      * The return value of the function will be null.
      */
-    static <T, R> FunctionWithException<T, R> toF(RunnableWithException r) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E> toF(
+            RunnableWithException<E> r) {
         return (t) -> {
             r.run();
             return null;
@@ -480,7 +495,8 @@ public interface Conversions {
      * The argument passed to the function will be discarded.
      * The function will return the value produced by the underlying supplier.
      */
-    static <T, R> FunctionWithException<T, R> toF(SupplierWithException<R> s) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E> toF(
+            SupplierWithException<R, E> s) {
         return (t) -> s.get();
     }
 
@@ -504,7 +520,8 @@ public interface Conversions {
      * to the underlying consumer.
      * The return value of the function will be null.
      */
-    static <T, R> FunctionWithException<T, R> toF(ConsumerWithException<T> c) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E> toF(
+            ConsumerWithException<T, E> c) {
         return (t) -> {
             c.accept(t);
             return null;
@@ -533,8 +550,8 @@ public interface Conversions {
      * The second argument to the consumer will receive null value.
      * The return value of the function will be null.
      */
-    static <T, R> FunctionWithException<T, R> toF(
-            BiConsumerWithException<T, ?> c) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E> toF(
+            BiConsumerWithException<T, ?, E> c) {
         return (t) -> {
             c.accept(t, null);
             return null;
@@ -560,8 +577,8 @@ public interface Conversions {
      * The second argument to the bi-function will receive null value.
      * The return value of the function will be null.
      */
-    static <T, R> FunctionWithException<T, R> toF(
-            BiFunctionWithException<T, ?, R> f) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E> toF(
+            BiFunctionWithException<T, ?, R, E> f) {
         return (t) -> f.apply(t, null);
     }
 
@@ -586,8 +603,8 @@ public interface Conversions {
      * The arguments passed to the function will be discarded.
      * The return value of the function will be null.
      */
-    static <T, U, R> BiFunctionWithException<T, U, R> toBF(
-            RunnableWithException r) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    toBF(RunnableWithException<E> r) {
         return (t, u) -> {
             r.run();
             return null;
@@ -611,8 +628,8 @@ public interface Conversions {
      * The return value of the function will be the value produced
      * by the underlying supplier.
      */
-    static <T, U, R> BiFunctionWithException<T, U, R> toBF(
-            SupplierWithException<R> s) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    toBF(SupplierWithException<R, E> s) {
         return (t, u) -> s.get();
     }
 
@@ -638,8 +655,8 @@ public interface Conversions {
      * The second argument passed to the function will be discarded.
      * The return value of the function will be null.
      */
-    static <T, U, R> BiFunctionWithException<T, U, R> toBF(
-            ConsumerWithException<T> c) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    toBF(ConsumerWithException<T, E> c) {
         return (t, u) -> {
             c.accept(t);
             return null;
@@ -664,8 +681,8 @@ public interface Conversions {
      * The arguments passed to the function will be passed to the consumer.
      * The return value of the function will be null.
      */
-    static <T, U, R> BiFunctionWithException<T, U, R> toBF(
-            BiConsumerWithException<T, U> c) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    toBF(BiConsumerWithException<T, U, E> c) {
         return (t, u) -> {
             c.accept(t, u);
             return null;
@@ -693,37 +710,41 @@ public interface Conversions {
      * The return value of the bi-function will be the value return
      * by the underlying function.
      */
-    static <T, U, R> BiFunctionWithException<T, U, R> toBF(
-            FunctionWithException<T, R> f) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    toBF(FunctionWithException<T, R, E> f) {
         return (t, u) -> f.apply(t);
     }
 
 
     ////////////////////// Functions to functions with exceptions  //////////
 
-    static RunnableWithException withException(Runnable f) {
+    static <E extends Exception> RunnableWithException<E> withException(
+            Runnable f) {
         return () -> f.run();
     }
 
-    static <R> SupplierWithException<R> withException(Supplier<R> f) {
+    static <R, E extends Exception> SupplierWithException<R, E> withException(
+            Supplier<R> f) {
         return () -> f.get();
     }
 
-    static <T> ConsumerWithException<T> withException(Consumer<T> f) {
+    static <T, E extends Exception> ConsumerWithException<T, E> withException(
+            Consumer<T> f) {
         return t -> f.accept(t);
     }
 
-    static <T, U> BiConsumerWithException<T, U> withException(
-            BiConsumerWithException<T, U> f) {
+    static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
+    withException(BiConsumer<T, U>f) {
         return (t, u) -> f.accept(t, u);
     }
 
-    static <T, R> FunctionWithException<T, R> withException(Function<T, R> f) {
+    static <T, R, E extends Exception> FunctionWithException<T, R, E>
+    withException(Function<T, R> f) {
         return t -> f.apply(t);
     }
 
-    static <T, U, R> BiFunctionWithException<T, U, R> withException(
-            BiFunction<T, U, R> f) {
+    static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
+    withException(BiFunction<T, U, R> f) {
         return (t, u) -> f.apply(t, u);
     }
 

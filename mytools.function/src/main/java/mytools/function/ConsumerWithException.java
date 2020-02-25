@@ -1,6 +1,6 @@
 package mytools.function;
 
 @FunctionalInterface
-public interface ConsumerWithException<T> {
-    void accept(T t) throws Exception;
+public interface ConsumerWithException<T, E extends Exception> {
+    void accept(T t) throws E;
 }

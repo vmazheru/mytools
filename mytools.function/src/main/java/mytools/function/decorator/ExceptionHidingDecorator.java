@@ -27,27 +27,27 @@ import mytools.function.SupplierWithException;
  *
  * @see Decorator
  */
-public interface ExceptionHidingDecorator<T, U, R> {
+public interface ExceptionHidingDecorator<T, U, R, E extends Exception> {
 
-    default Runnable decorate(RunnableWithException f) {
+    default Runnable decorate(RunnableWithException<E> f) {
         return toR(decorate(toBF(f)));
     }
 
-    default Supplier<R> decorate(SupplierWithException<R> f) {
+    default Supplier<R> decorate(SupplierWithException<R, E> f) {
         return toS(decorate(toBF(f)));
     }
 
-    default Consumer<T> decorate(ConsumerWithException<T> f) {
+    default Consumer<T> decorate(ConsumerWithException<T, E> f) {
         return toC(decorate(toBF(f)));
     }
 
-    default Function<T, R> decorate(FunctionWithException<T, R> f) {
+    default Function<T, R> decorate(FunctionWithException<T, R, E> f) {
         return toF(decorate(toBF(f)));
     }
 
-    default BiConsumer<T, U> decorate(BiConsumerWithException<T, U> f) {
+    default BiConsumer<T, U> decorate(BiConsumerWithException<T, U, E> f) {
         return toBC(decorate(toBF(f)));
     }
 
-    BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R> f);
+    BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R, E> f);
 }
