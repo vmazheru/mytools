@@ -174,14 +174,16 @@ public interface RetryDecorators {
     static <R> Supplier<R> retried(
             RetryPolicy p,
             Consumer<Exception> beforeSleep,
-            Supplier<R> f, Runnable afterSleep) {
+            Supplier<R> f,
+            Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
     }
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep, Supplier<R> f) {
+            Consumer<Exception> beforeSleep,
+            Supplier<R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
@@ -209,21 +211,24 @@ public interface RetryDecorators {
         return retriedWithException(p, null, null, f, null);
     }
 
-    static <R, E extends Exception> SupplierWithException<R, E> retried(
+    static <R, E extends Exception> SupplierWithException<R, E>
+    retriedWithException(
             RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             SupplierWithException<R, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
 
-    static <R, E extends Exception> SupplierWithException<R, E> retried(
+    static <R, E extends Exception> SupplierWithException<R, E>
+    retriedWithException(
             RetryPolicy p,
             Consumer<Exception> beforeSleep,
             SupplierWithException<R, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
 
-    static <R, E extends Exception> SupplierWithException<R, E> retried(
+    static <R, E extends Exception> SupplierWithException<R, E>
+    retriedWithException(
             RetryPolicy p,
             Consumer<Exception> beforeSleep,
             SupplierWithException<R, E> f,
@@ -231,7 +236,8 @@ public interface RetryDecorators {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
     }
 
-    static <R, E extends Exception> SupplierWithException<R, E> retried(
+    static <R, E extends Exception> SupplierWithException<R, E>
+    retriedWithException(
             RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
@@ -756,97 +762,158 @@ public interface RetryDecorators {
         retried(p, exceptionClasses, beforeSleep, f, afterSleep).run();
     }
 
+    static <E extends Exception> void retryWithException(
+            int numRetries, long sleep, RunnableWithException<E> f) throws E {
+        retriedWithException(numRetries, sleep, f).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            RunnableWithException<E> f) throws E {
+        retriedWithException(p, f).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            RunnableWithException<E> f) throws E {
+        retriedWithException(p, exceptionClasses, f).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            RunnableWithException<E> f) throws E {
+        retriedWithException(p, beforeSleep, f).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            RunnableWithException<E> f,
+            Runnable afterSleep) throws  E {
+        retriedWithException(p, beforeSleep, f, afterSleep).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            RunnableWithException<E> f) throws E {
+        retriedWithException(p, exceptionClasses, beforeSleep, f).run();
+    }
+
+    static <E extends Exception> void retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            RunnableWithException<E> f,
+            Runnable afterSleep) throws E {
+        retriedWithException(
+                p, exceptionClasses, beforeSleep, f, afterSleep).run();
+    }
+
 
     // -------------- Supplier ----------------- //
 
-    /**
-     * Apply {@link LinearRetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param numRetries how many times to retry
-     * @param sleep      for how long to sleep between retries
-     * @param f          code to retry
-     */
     static <R> R retry(int numRetries, long sleep, Supplier<R> f) {
         return retried(numRetries, sleep, f).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p retry policy
-     * @param f code to retry
-     */
-    static <R> R retry(RetryPolicy p, Supplier<R> f) {
+    static <R> R retry(
+            RetryPolicy p,
+            Supplier<R> f) {
         return retried(p, f).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p                 retry policy
-     * @param exceptionClasses  exception types on which execute retries
-     * @param f                 code to retry
-     */
-    static <R> R retry(RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses, Supplier<R> f) {
+    static <R> R retry(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Supplier<R> f) {
         return retried(p, exceptionClasses, f).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p           retry policy
-     * @param beforeSleep code to execute before going to sleep
-     * @param f           code to retry
-     */
-    static <R> R retry(RetryPolicy p,
-            Consumer<Exception> beforeSleep, Supplier<R> f) {
+    static <R> R retry(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            Supplier<R> f) {
         return retried(p, beforeSleep, f).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p             retry policy
-     * @param beforeSleep   code to execute before going to sleep
-     * @param f             code to retry
-     * @param afterSleep    code to execute after sleeping
-     */
-    static <R> R retry(RetryPolicy p,
+    static <R> R retry(
+            RetryPolicy p,
             Consumer<Exception> beforeSleep,
-            Supplier<R> f, Runnable afterSleep) {
+            Supplier<R> f,
+            Runnable afterSleep) {
         return retried(p, beforeSleep, f, afterSleep).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p                retry policy
-     * @param exceptionClasses exception types on which to execute the retries
-     * @param beforeSleep      code to execute before sleeping
-     * @param f                code to retry
-     */
-    static <R> R retry(RetryPolicy p,
+    static <R> R retry(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
             Supplier<R> f) {
         return retried(p, exceptionClasses, beforeSleep, f).get();
     }
 
-    /**
-     * Apply given {@link RetryPolicy} to a {@code Supplier} and execute it.
-     *
-     * @param p                  retry policy
-     * @param exceptionClasses   exception types on which to execute the retries
-     * @param beforeSleep        code to execute before sleeping
-     * @param f                  code to retry
-     * @param afterSleep         code to execute after sleeping
-     */
-    static <R> R retry(RetryPolicy p,
+    static <R> R retry(
+            RetryPolicy p,
             List<Class<? extends Exception>> exceptionClasses,
             Consumer<Exception> beforeSleep,
-            Supplier<R> f, Runnable afterSleep) {
+            Supplier<R> f,
+            Runnable afterSleep) {
         return retried(p, exceptionClasses, beforeSleep, f, afterSleep).get();
     }
 
+    static <R, E extends Exception> R retryWithException(
+            int numRetries, long sleep, SupplierWithException<R, E> f)
+                    throws E {
+        return retriedWithException(numRetries, sleep, f).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            SupplierWithException<R, E> f) throws E {
+        return retriedWithException(p, f).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            SupplierWithException<R, E> f) throws E {
+        return retriedWithException(p, exceptionClasses, f).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R, E> f) throws E {
+        return retriedWithException(p, beforeSleep, f).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R, E> f,
+            Runnable afterSleep) throws E {
+        return retriedWithException(p, beforeSleep, f, afterSleep).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R, E> f) throws E {
+        return retriedWithException(p, exceptionClasses, beforeSleep, f).get();
+    }
+
+    static <R, E extends Exception> R retryWithException(
+            RetryPolicy p,
+            List<Class<? extends Exception>> exceptionClasses,
+            Consumer<Exception> beforeSleep,
+            SupplierWithException<R, E> f,
+            Runnable afterSleep) throws E {
+        return retriedWithException(
+                p, exceptionClasses, beforeSleep, f, afterSleep).get();
+    }
 }
