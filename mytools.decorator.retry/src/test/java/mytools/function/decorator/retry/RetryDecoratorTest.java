@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import mytools.function.object.Counter;
 
-public class RetryDecoratorsTest {
+public class RetryDecoratorTest {
 
     private final LinearRetryPolicy p = new LinearRetryPolicy(3, 10);
     private final Runnable runnableWithRuntimeException = () -> {
