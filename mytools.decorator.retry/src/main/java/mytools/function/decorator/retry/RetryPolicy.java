@@ -12,7 +12,7 @@ public interface RetryPolicy {
     /**
      * Return a number of milliseconds which code should be suspended for
      * before the next retry takes place.
-     * Returning a zero forces the decorator to give up and
+     * Returning a negative value forces he decorator to give up and
      * re-throw the exception.
      *
      * @return number of milliseconds for which the code will be sleeping

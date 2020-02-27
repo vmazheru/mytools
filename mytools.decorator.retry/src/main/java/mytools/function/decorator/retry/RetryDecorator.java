@@ -88,9 +88,11 @@ final class RetryDecorator<T, U, R, E extends Exception>
                 } catch (Exception e) {
                     if (ofTargetClass(e)) {
                         long sleepTime = retryPolicy.nextRetryIn();
-                        if (sleepTime > 0) {
+                        if (sleepTime >= 0) {
                             before.ifPresent(before -> before.accept(e));
-                            Threads.sleep(sleepTime);
+                            if (sleepTime > 0) {
+                                Threads.sleep(sleepTime);
+                            }
                             after.ifPresent(after -> after.run());
                             continue;
                         }

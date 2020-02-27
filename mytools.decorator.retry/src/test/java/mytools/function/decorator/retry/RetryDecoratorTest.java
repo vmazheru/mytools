@@ -13,7 +13,7 @@ import mytools.function.object.Counter;
 
 public class RetryDecoratorTest {
 
-    private final LinearRetryPolicy p = new LinearRetryPolicy(3, 10);
+    private final LinearRetryPolicy p = new LinearRetryPolicy(3, 5);
     private final Runnable runnableWithRuntimeException = () -> {
         throw new RuntimeException("foo");
     };

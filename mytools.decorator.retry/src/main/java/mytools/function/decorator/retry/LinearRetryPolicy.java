@@ -21,13 +21,17 @@ public final class LinearRetryPolicy implements RetryPolicy {
      * @param sleepTime  For how long to sleep between retries?
      */
     public LinearRetryPolicy(int numRetries, long sleepTime) {
+        if (sleepTime < 0) {
+            throw new IllegalArgumentException(
+                    "Sleep time must be non-negative");
+        }
         this.sleepTime = sleepTime;
         this.numRetries = numRetries;
     }
 
     @Override
     public long nextRetryIn() {
-        return (counter++ >= numRetries) ? 0 : sleepTime;
+        return (counter++ >= numRetries) ? -1 : sleepTime;
     }
 
     public int getNumRetries() {
