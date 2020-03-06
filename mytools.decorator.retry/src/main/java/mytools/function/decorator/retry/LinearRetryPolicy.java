@@ -31,7 +31,7 @@ public final class LinearRetryPolicy implements RetryPolicy {
 
     @Override
     public long nextRetryIn() {
-        return (counter++ >= numRetries) ? -1 : sleepTime;
+        return (++counter >= numRetries) ? -1 : sleepTime;
     }
 
     public int getNumRetries() {

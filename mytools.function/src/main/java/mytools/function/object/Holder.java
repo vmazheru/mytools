@@ -4,6 +4,12 @@ public final class Holder<T> {
 
     private T object;
 
+    public Holder() { }
+
+    public Holder(T obj) {
+        object = obj;
+    }
+
     public T get() {
         return object;
     }
