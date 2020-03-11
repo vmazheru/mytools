@@ -1,9 +1,7 @@
 package mytools.function.decorator.retry;
 
 import static mytools.function.decorator.retry.RetryDecorators.retried;
-import static mytools.function.decorator.retry.RetryDecorators.retriedWithException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -20,11 +18,13 @@ public class RetryDecoratorsTest {
 
     @Test
     public void retriedRunnable() {
-        test(THREE, ZERO, ZERO, true, () ->
+        test(THREE, ZERO, ZERO, () ->
             retried(NUM_RETRIES, SLEEP_TIME, badRunnable).run());
-        test(THREE, ZERO, ZERO, true, () ->
+
+        test(THREE, ZERO, ZERO, () ->
             retried(policy(), badRunnable).run());
-        test(THREE, ZERO, ZERO, true, () ->
+
+        test(THREE, ZERO, ZERO, () ->
             retried(policy(), badRunnable).run());
 
 
@@ -32,36 +32,32 @@ public class RetryDecoratorsTest {
 
 
 
-
-
-        test(THREE, ZERO, ZERO, true, () ->
-            retriedWithException(NUM_RETRIES, SLEEP_TIME,
-                badRunnableWithException).run());
+//        test(THREE, ZERO, ZERO, true, () ->
+//            retriedWithException(NUM_RETRIES, SLEEP_TIME,
+//                badRunnableWithException).run());
     }
 
     private static void test(
             int expectedExecutionCount,
             int expectedBeforeCount,
             int expectedAfterCount,
-            boolean checkThrow,
-            RunnableWithException<IOException> r) {
-        reset();
-        try {
-            long start = System.currentTimeMillis();
-            if (checkThrow) {
-                assertThrows(Exception.class, () -> r.run());
-            } else {
-                r.run();
-            }
-            long timeSpent = System.currentTimeMillis() - start;
+            Runnable r) {
+        resetCounters();
 
-            assertTrue(timeSpent >= EXPECTED_RUN_TIME);
-            assertEquals(expectedExecutionCount, executionCounter.get());
-            assertEquals(expectedBeforeCount, beforeCounter.get());
-            assertEquals(expectedAfterCount, afterCounter.get());
-        } catch (IOException e) {
-            fail(e);
+        long start = System.currentTimeMillis();
+        try {
+            r.run();
+            fail("Must throw runtime excepiton");
+        } catch (@SuppressWarnings("unused")
+                 NullPointerException | IllegalArgumentException e) {
+            // ok
         }
+        long timeSpent = System.currentTimeMillis() - start;
+
+        assertTrue(timeSpent >= EXPECTED_RUN_TIME);
+        assertEquals(expectedExecutionCount, executionCounter.get());
+        assertEquals(expectedBeforeCount, beforeCounter.get());
+        assertEquals(expectedAfterCount, afterCounter.get());
     }
 
     private static final int NUM_RETRIES = 3;
@@ -152,7 +148,7 @@ public class RetryDecoratorsTest {
         }
     }
 
-    private static void reset() {
+    private static void resetCounters() {
         executionCounter.reset();
         beforeCounter.reset();
         afterCounter.reset();
