@@ -52,21 +52,21 @@ public interface RetryDecorators {
 
     static Runnable retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Runnable f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static Runnable retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static Runnable retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -74,16 +74,16 @@ public interface RetryDecorators {
 
     static Runnable retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static Runnable retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f,
             Runnable afterSleep) {
         return new RetryDecorator<>(
@@ -106,21 +106,21 @@ public interface RetryDecorators {
 
     static <E extends Exception> RunnableWithException<E> retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             RunnableWithException<E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
 
     static <E extends Exception> RunnableWithException<E> retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
 
     static <E extends Exception> RunnableWithException<E> retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -128,19 +128,19 @@ public interface RetryDecorators {
 
     static <E extends Exception> RunnableWithException<E> retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <E extends Exception> RunnableWithException<E> retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f,
             Runnable afterSleep) {
-        return new RetryDecorator<Object, Object, Object, E>(
+        return new RetryDecorator<>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -159,21 +159,21 @@ public interface RetryDecorators {
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Supplier<R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -181,19 +181,19 @@ public interface RetryDecorators {
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <R> Supplier<R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f,
             Runnable afterSleep) {
-        return new RetryDecorator<Object, Object, R, Exception>(
+        return new RetryDecorator<Object, Object, R, RuntimeException>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -214,7 +214,7 @@ public interface RetryDecorators {
     static <R, E extends Exception> SupplierWithException<R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             SupplierWithException<R, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
@@ -222,7 +222,7 @@ public interface RetryDecorators {
     static <R, E extends Exception> SupplierWithException<R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
@@ -230,7 +230,7 @@ public interface RetryDecorators {
     static <R, E extends Exception> SupplierWithException<R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -239,8 +239,8 @@ public interface RetryDecorators {
     static <R, E extends Exception> SupplierWithException<R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
@@ -248,8 +248,8 @@ public interface RetryDecorators {
     static <R, E extends Exception> SupplierWithException<R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f,
             Runnable afterSleep) {
         return new RetryDecorator<Object, Object, R, E>(
@@ -271,21 +271,21 @@ public interface RetryDecorators {
 
     static <T> Consumer<T> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Consumer<T> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static <T> Consumer<T> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Consumer<T> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static <T> Consumer<T> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Consumer<T> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -293,19 +293,19 @@ public interface RetryDecorators {
 
     static <T> Consumer<T> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Consumer<T> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <T> Consumer<T> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Consumer<T> f,
             Runnable afterSleep) {
-        return new RetryDecorator<T, Object, Object, Exception>(
+        return new RetryDecorator<T, Object, Object, RuntimeException>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -325,7 +325,7 @@ public interface RetryDecorators {
     static <T, E extends Exception> ConsumerWithException<T, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             ConsumerWithException<T, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
@@ -333,7 +333,7 @@ public interface RetryDecorators {
     static <T, E extends Exception> ConsumerWithException<T, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             ConsumerWithException<T, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
@@ -341,7 +341,7 @@ public interface RetryDecorators {
     static <T, E extends Exception> ConsumerWithException<T, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             ConsumerWithException<T, E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -350,8 +350,8 @@ public interface RetryDecorators {
     static <T, E extends Exception> ConsumerWithException<T, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             ConsumerWithException<T, E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
@@ -359,8 +359,8 @@ public interface RetryDecorators {
     static <T, E extends Exception> ConsumerWithException<T, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             ConsumerWithException<T, E> f,
             Runnable afterSleep) {
         return new RetryDecorator<T, Object, Object, E>(
@@ -383,21 +383,21 @@ public interface RetryDecorators {
 
     static <T, U> BiConsumer<T, U> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             BiConsumer<T, U> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static <T, U> BiConsumer<T, U> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             BiConsumer<T, U> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static <T, U> BiConsumer<T, U> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             BiConsumer<T, U> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -405,19 +405,19 @@ public interface RetryDecorators {
 
     static <T, U> BiConsumer<T, U> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             BiConsumer<T, U> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <T, U> BiConsumer<T, U> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             BiConsumer<T, U> f,
             Runnable afterSleep) {
-        return new RetryDecorator<T, U, Object, Exception>(
+        return new RetryDecorator<T, U, Object, RuntimeException>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -438,7 +438,7 @@ public interface RetryDecorators {
     static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             BiConsumerWithException<T, U, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
@@ -446,7 +446,7 @@ public interface RetryDecorators {
     static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             BiConsumerWithException<T, U, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
@@ -454,7 +454,7 @@ public interface RetryDecorators {
     static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             BiConsumerWithException<T, U, E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -463,8 +463,8 @@ public interface RetryDecorators {
     static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             BiConsumerWithException<T, U, E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
@@ -472,8 +472,8 @@ public interface RetryDecorators {
     static <T, U, E extends Exception> BiConsumerWithException<T, U, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             BiConsumerWithException<T, U, E> f,
             Runnable afterSleep) {
         return new RetryDecorator<T, U, Object, E>(
@@ -497,21 +497,21 @@ public interface RetryDecorators {
 
     static <T, R> Function<T, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Function<T, R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static <T, R> Function<T, R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Function<T, R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static <T, R> Function<T, R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Function<T, R> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -519,19 +519,19 @@ public interface RetryDecorators {
 
     static <T, R> Function<T, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Function<T, R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <T, R> Function<T, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Function<T, R> f,
             Runnable afterSleep) {
-        return new RetryDecorator<T, Object, R, Exception>(
+        return new RetryDecorator<T, Object, R, RuntimeException>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -552,7 +552,7 @@ public interface RetryDecorators {
     static <T, R, E extends Exception> FunctionWithException<T, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             FunctionWithException<T, R, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
@@ -560,7 +560,7 @@ public interface RetryDecorators {
     static <T, R, E extends Exception> FunctionWithException<T, R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             FunctionWithException<T, R, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
@@ -568,7 +568,7 @@ public interface RetryDecorators {
     static <T, R, E extends Exception> FunctionWithException<T, R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             FunctionWithException<T, R, E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -577,8 +577,8 @@ public interface RetryDecorators {
     static <T, R, E extends Exception> FunctionWithException<T, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             FunctionWithException<T, R, E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
@@ -586,8 +586,8 @@ public interface RetryDecorators {
     static <T, R, E extends Exception> FunctionWithException<T, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             FunctionWithException<T, R, E> f,
             Runnable afterSleep) {
         return new RetryDecorator<T, Object, R, E>(
@@ -611,21 +611,21 @@ public interface RetryDecorators {
 
     static <T, U, R> BiFunction<T, U, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             BiFunction<T, U, R> f) {
         return retried(p, exceptionClasses, null, f, null);
     }
 
     static <T, U, R> BiFunction<T, U, R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             BiFunction<T, U, R> f) {
         return retried(p, null, beforeSleep, f, null);
     }
 
     static <T, U, R> BiFunction<T, U, R> retried(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             BiFunction<T, U, R> f,
             Runnable afterSleep) {
         return retried(p, null, beforeSleep, f, afterSleep);
@@ -633,19 +633,19 @@ public interface RetryDecorators {
 
     static <T, U, R> BiFunction<T, U, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             BiFunction<T, U, R> f) {
         return retried(p, exceptionClasses, beforeSleep, f, null);
     }
 
     static <T, U, R> BiFunction<T, U, R> retried(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             BiFunction<T, U, R> f,
             Runnable afterSleep) {
-        return new RetryDecorator<T, U, R, Exception>(
+        return new RetryDecorator<T, U, R, RuntimeException>(
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
@@ -666,7 +666,7 @@ public interface RetryDecorators {
     static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             BiFunctionWithException<T, U, R, E> f) {
         return retriedWithException(p, exceptionClasses, null, f, null);
     }
@@ -674,7 +674,7 @@ public interface RetryDecorators {
     static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             BiFunctionWithException<T, U, R, E> f) {
         return retriedWithException(p, null, beforeSleep, f, null);
     }
@@ -682,7 +682,7 @@ public interface RetryDecorators {
     static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
     retriedWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             BiFunctionWithException<T, U, R, E> f,
             Runnable afterSleep) {
         return retriedWithException(p, null, beforeSleep, f, afterSleep);
@@ -691,8 +691,8 @@ public interface RetryDecorators {
     static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             BiFunctionWithException<T, U, R, E> f) {
         return retriedWithException(p, exceptionClasses, beforeSleep, f, null);
     }
@@ -700,8 +700,8 @@ public interface RetryDecorators {
     static <T, U, R, E extends Exception> BiFunctionWithException<T, U, R, E>
     retriedWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             BiFunctionWithException<T, U, R, E> f,
             Runnable afterSleep) {
         return new RetryDecorator<T, U, R, E>(
@@ -725,21 +725,21 @@ public interface RetryDecorators {
 
     static void retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Runnable f) {
         retried(p, exceptionClasses, f).run();
     }
 
     static void retry(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f) {
         retried(p, beforeSleep, f).run();
     }
 
     static void retry(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f,
             Runnable afterSleep) {
         retried(p, beforeSleep, f, afterSleep).run();
@@ -747,16 +747,16 @@ public interface RetryDecorators {
 
     static void retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f) {
         retried(p, exceptionClasses, beforeSleep, f).run();
     }
 
     static void retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Runnable f,
             Runnable afterSleep) {
         retried(p, exceptionClasses, beforeSleep, f, afterSleep).run();
@@ -775,21 +775,21 @@ public interface RetryDecorators {
 
     static <E extends Exception> void retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             RunnableWithException<E> f) throws E {
         retriedWithException(p, exceptionClasses, f).run();
     }
 
     static <E extends Exception> void retryWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f) throws E {
         retriedWithException(p, beforeSleep, f).run();
     }
 
     static <E extends Exception> void retryWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f,
             Runnable afterSleep) throws  E {
         retriedWithException(p, beforeSleep, f, afterSleep).run();
@@ -797,16 +797,16 @@ public interface RetryDecorators {
 
     static <E extends Exception> void retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f) throws E {
         retriedWithException(p, exceptionClasses, beforeSleep, f).run();
     }
 
     static <E extends Exception> void retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             RunnableWithException<E> f,
             Runnable afterSleep) throws E {
         retriedWithException(
@@ -828,21 +828,21 @@ public interface RetryDecorators {
 
     static <R> R retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends RuntimeException>> exceptionClasses,
             Supplier<R> f) {
         return retried(p, exceptionClasses, f).get();
     }
 
     static <R> R retry(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f) {
         return retried(p, beforeSleep, f).get();
     }
 
     static <R> R retry(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f,
             Runnable afterSleep) {
         return retried(p, beforeSleep, f, afterSleep).get();
@@ -850,16 +850,16 @@ public interface RetryDecorators {
 
     static <R> R retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f) {
         return retried(p, exceptionClasses, beforeSleep, f).get();
     }
 
     static <R> R retry(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends RuntimeException>> exceptionClasses,
+            Consumer<RuntimeException> beforeSleep,
             Supplier<R> f,
             Runnable afterSleep) {
         return retried(p, exceptionClasses, beforeSleep, f, afterSleep).get();
@@ -879,21 +879,21 @@ public interface RetryDecorators {
 
     static <R, E extends Exception> R retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
+            List<Class<? extends E>> exceptionClasses,
             SupplierWithException<R, E> f) throws E {
         return retriedWithException(p, exceptionClasses, f).get();
     }
 
     static <R, E extends Exception> R retryWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f) throws E {
         return retriedWithException(p, beforeSleep, f).get();
     }
 
     static <R, E extends Exception> R retryWithException(
             RetryPolicy p,
-            Consumer<Exception> beforeSleep,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f,
             Runnable afterSleep) throws E {
         return retriedWithException(p, beforeSleep, f, afterSleep).get();
@@ -901,16 +901,16 @@ public interface RetryDecorators {
 
     static <R, E extends Exception> R retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f) throws E {
         return retriedWithException(p, exceptionClasses, beforeSleep, f).get();
     }
 
     static <R, E extends Exception> R retryWithException(
             RetryPolicy p,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> beforeSleep,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<E> beforeSleep,
             SupplierWithException<R, E> f,
             Runnable afterSleep) throws E {
         return retriedWithException(

@@ -31,8 +31,8 @@ final class RetryDecorator<T, U, R, E extends Exception>
     implements DecoratorWithException<T, U, R, E> {
 
     private final RetryPolicy retryPolicy;
-    private final List<Class<? extends Exception>> exceptionClasses;
-    private final Optional<Consumer<Exception>> before;
+    private final List<Class<? extends E>> exceptionClasses;
+    private final Optional<Consumer<? super E>> before;
     private final Optional<Runnable> after;
 
     /**
@@ -48,8 +48,8 @@ final class RetryDecorator<T, U, R, E extends Exception>
      */
     RetryDecorator(
             RetryPolicy retryPolicy,
-            List<Class<? extends Exception>> exceptionClasses,
-            Consumer<Exception> before,
+            List<Class<? extends E>> exceptionClasses,
+            Consumer<? super E> before,
             Runnable after) {
         this.retryPolicy = retryPolicy;
         this.exceptionClasses = exceptionClasses;
@@ -86,10 +86,11 @@ final class RetryDecorator<T, U, R, E extends Exception>
                 try {
                     return f.apply(t, u);
                 } catch (Exception e) {
-                    if (ofTargetClass(e)) {
+                    @SuppressWarnings("unchecked") E ex = (E) e;
+                    if (ofTargetClass(ex)) {
                         long sleepTime = retryPolicy.nextRetryIn();
                         if (sleepTime >= 0) {
-                            before.ifPresent(before -> before.accept(e));
+                            before.ifPresent(before -> before.accept(ex));
                             if (sleepTime > 0) {
                                 Threads.sleep(sleepTime);
                             }
@@ -107,7 +108,7 @@ final class RetryDecorator<T, U, R, E extends Exception>
         if (exceptionClasses == null || exceptionClasses.isEmpty()) {
             return true;
         }
-        for (Class<? extends Exception> klass : exceptionClasses) {
+        for (Class<? extends E> klass : exceptionClasses) {
             if (klass.isInstance(e)) {
                 return true;
             }
