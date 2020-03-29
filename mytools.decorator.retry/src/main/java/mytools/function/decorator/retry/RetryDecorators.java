@@ -16,8 +16,8 @@ import mytools.function.SupplierWithException;
 
 
 /**
- * Different overloaded static methods which decorate a function call with retry
- * logic.
+ * Contains different overloaded static methods which decorate a function call
+ * with retry logic.
  *
  * <p>
  * The methods in this class could be divided into two groups.
