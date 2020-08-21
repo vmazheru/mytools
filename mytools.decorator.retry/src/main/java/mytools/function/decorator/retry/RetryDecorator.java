@@ -108,7 +108,7 @@ final class RetryDecorator<T, U, R, E extends Exception>
         if (exceptionClasses == null || exceptionClasses.isEmpty()) {
             return true;
         }
-        for (Class<? extends E> klass : exceptionClasses) {
+        for (Class<? extends Exception> klass : exceptionClasses) {
             if (klass.isInstance(e)) {
                 return true;
             }

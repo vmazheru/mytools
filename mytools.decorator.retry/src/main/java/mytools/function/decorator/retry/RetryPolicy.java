@@ -7,6 +7,7 @@ package mytools.function.decorator.retry;
  * @see RetryDecorator
  * @see RetryDecorators
  */
+@FunctionalInterface
 public interface RetryPolicy {
 
     /**

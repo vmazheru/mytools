@@ -1,13 +1,13 @@
 package mytools.function.decorator.retry;
 
 import static mytools.function.decorator.retry.RetryDecorators.retried;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static mytools.function.decorator.retry.RetryDecorators.retriedWithException;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Random;
+import java.util.Arrays;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,142 +16,168 @@ import mytools.function.object.Counter;
 
 public class RetryDecoratorsTest {
 
+    private static class Shaky {
+        private final Counter c = new Counter();
+        private boolean beforeSleepExecuted;
+        private boolean afterSleepExecuted;
+
+        @SuppressWarnings("serial")
+        static class RuntimeException extends java.lang.RuntimeException {}
+
+        @SuppressWarnings("serial")
+        static class Exception extends java.lang.Exception {}
+
+        @SuppressWarnings("serial")
+        static class ConcatException extends Exception {}
+
+        @SuppressWarnings("serial")
+        static class UnrelatedException extends Exception {}
+
+
+        String sum(Integer i, Long l) {
+            if (c.incrementAndGet() < 3) {
+                throw new RuntimeException();
+            }
+            c.reset();
+            return Long.toString(i.longValue() + l.longValue());
+        }
+
+        String concat(Integer i, Long l) throws ConcatException {
+            if (c.incrementAndGet() < 3) {
+                throw new ConcatException();
+            }
+            c.reset();
+            return i.toString() + l.toString();
+        }
+
+        boolean wasBeforeSleepExecuted() {
+            boolean itWas = beforeSleepExecuted;
+            beforeSleepExecuted = false;
+            return itWas;
+        }
+
+        void beforeSleep(java.lang.RuntimeException e) {
+            assertTrue(e instanceof RuntimeException);
+            beforeSleepExecuted = true;
+        }
+
+        void beforeSleep(Exception e) {
+            assertTrue(e instanceof ConcatException);
+            beforeSleepExecuted = true;
+        }
+
+        boolean wasAfterSleepExecuted() {
+            boolean itWas = afterSleepExecuted;
+            afterSleepExecuted = false;
+            return itWas;
+        }
+
+        void afterSleep() {
+            afterSleepExecuted = true;
+        }
+    }
+
+    private Supplier<RetryPolicy> threeTimes =
+            () -> new LinearRetryPolicy(3, 10);
+
     @Test
-    public void retriedRunnable() {
-        test(THREE, ZERO, ZERO, () ->
-            retried(NUM_RETRIES, SLEEP_TIME, badRunnable).run());
+    public void runnable() {
+        Shaky shaky = new Shaky();
+        Runnable bare = () -> shaky.sum(3, 5L);
 
-        test(THREE, ZERO, ZERO, () ->
-            retried(policy(), badRunnable).run());
+        retried(3, 10, bare).run();
+        retried(threeTimes.get(), bare).run();
+        retried(threeTimes.get(), Arrays.asList(), bare).run();
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                Arrays.asList(NullPointerException.class), bare).run());
+        retried(threeTimes.get(),
+                Arrays.asList(Shaky.RuntimeException.class), bare).run();
 
-        test(THREE, ZERO, ZERO, () ->
-            retried(policy(), badRunnable).run());
+        retried(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
 
+        retried(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
 
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
 
+        retried(threeTimes.get(), Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
 
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
 
-
-//        test(THREE, ZERO, ZERO, true, () ->
-//            retriedWithException(NUM_RETRIES, SLEEP_TIME,
-//                badRunnableWithException).run());
+        retried(threeTimes.get(), Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
     }
 
-    private static void test(
-            int expectedExecutionCount,
-            int expectedBeforeCount,
-            int expectedAfterCount,
-            Runnable r) {
-        resetCounters();
+    @Test
+    public void runnableWithException() throws Shaky.Exception {
+        Shaky shaky = new Shaky();
+        RunnableWithException<Shaky.Exception> bare = () -> shaky.concat(3, 5L);
 
-        long start = System.currentTimeMillis();
-        try {
-            r.run();
-            fail("Must throw runtime excepiton");
-        } catch (@SuppressWarnings("unused")
-                 NullPointerException | IllegalArgumentException e) {
-            // ok
-        }
-        long timeSpent = System.currentTimeMillis() - start;
+        retriedWithException(3, 10, bare).run();
+        retriedWithException(threeTimes.get(), bare).run();
+        retriedWithException(threeTimes.get(), Arrays.asList(), bare).run();
+        assertThrows(Shaky.ConcatException.class,
+                () -> retriedWithException(threeTimes.get(),
+                Arrays.asList(Shaky.UnrelatedException.class), bare).run());
 
-        assertTrue(timeSpent >= EXPECTED_RUN_TIME);
-        assertEquals(expectedExecutionCount, executionCounter.get());
-        assertEquals(expectedBeforeCount, beforeCounter.get());
-        assertEquals(expectedAfterCount, afterCounter.get());
+        retriedWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class), bare).run();
+
+        retriedWithException(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        retriedWithException(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retriedWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
+
+        retriedWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retriedWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
+
+        retriedWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()).run();
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
     }
 
-    private static final int NUM_RETRIES = 3;
-    private static final long SLEEP_TIME = 50;
-    private static final long EXPECTED_RUN_TIME =
-            SLEEP_TIME * (NUM_RETRIES - 1);
-    private static final int ZERO = 0;
-    //private static final int ONE = 1;
-    private static final int THREE = 3;
 
-    private static Random rand = new Random();
 
-    @SuppressWarnings("unchecked")
-    private static Class<? extends RuntimeException>[] runtimeExceptions =
-            new Class[] {
-                    NullPointerException.class,
-                    IllegalArgumentException.class };
-
-    @SuppressWarnings("unchecked")
-    private static Class<? extends IOException>[] exceptions =
-            new Class[] {
-                    NullPointerException.class,
-                    IOException.class };
-
-    private static Counter executionCounter = new Counter();
-    private static Counter beforeCounter = new Counter();
-    private static Counter afterCounter = new Counter();
-
-    //////////// functions that always fail ////////////////////
-    private static Runnable
-    badRunnable = () -> incrementAndThrowRuntimeException(true);
-    private static RunnableWithException<IOException>
-    badRunnableWithException = () -> incrementAndThrowException(true);
-
-    ///////// functions that succeed on second try ////////////
-    private static Runnable
-    shakeyRunnable = () -> incrementAndThrowRuntimeException(false);
-    private static RunnableWithException<IOException>
-    shakeyRunnableWithException = () -> incrementAndThrowException(false);
-
-    private static void incrementAndThrowRuntimeException(boolean always) {
-        executionCounter.increment();
-        if (always || executionCounter.get() <= 1) {
-            throwRandomRuntimeException();
-        }
-    }
-
-    private static void incrementAndThrowException(boolean always)
-            throws IOException {
-        executionCounter.increment();
-        if (always || executionCounter.get() <= 1) {
-            throwRandomException();
-        }
-    }
-
-    private static RetryPolicy policy() {
-        return new LinearRetryPolicy(NUM_RETRIES, SLEEP_TIME);
-    }
-
-    private static void throwRandomException() throws IOException {
-        throwException(exceptions[rand.nextInt(exceptions.length)]);
-    }
-
-    private static void throwRandomRuntimeException() {
-        throwRuntimeException(
-                runtimeExceptions[rand.nextInt(runtimeExceptions.length)]);
-    }
-
-    private static void throwException(
-            Class<? extends IOException> klass) throws IOException {
-        throw getExceptionInstance(klass);
-    }
-
-    private static void throwRuntimeException(
-            Class<? extends RuntimeException> klass) {
-        throw getExceptionInstance(klass);
-    }
-
-    private static <E extends Exception> E getExceptionInstance(
-            Class<E> klass) {
-        try {
-            return klass.getConstructor().newInstance();
-        } catch (InvocationTargetException |
-                 IllegalAccessException |
-                 NoSuchMethodException |
-                 InstantiationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void resetCounters() {
-        executionCounter.reset();
-        beforeCounter.reset();
-        afterCounter.reset();
-    }
 
 }
