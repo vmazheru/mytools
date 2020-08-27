@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -100,6 +103,41 @@ public class RetryDecoratorsTest {
 
     private Supplier<RetryPolicy> threeTimes =
             () -> new LinearRetryPolicy(3, 10);
+
+    @Test
+    public void examples() {
+        retry(3, 10, () -> System.out.println());
+        retry(3, 10, () -> 5);
+
+        retried(3, 10, () -> System.out.println()).run();
+        retried(3, 10, () -> 5).get();
+
+        assertThrows(IOException.class, () ->
+            retryWithException(
+                    3, 10, () -> Files.delete(Path.of("some/path")))
+        );
+
+        assertThrows(IOException.class, () ->
+            retryWithException(3, 10,
+                    () -> {
+                        Files.delete(Path.of("some/path"));
+                        return true;
+                    })
+        );
+
+        assertThrows(IOException.class, () ->
+            retriedWithException(
+                    3, 10, () -> Files.delete(Path.of("some/path"))).run()
+        );
+
+        assertThrows(IOException.class, () ->
+            retriedWithException(3, 10,
+                    () -> {
+                        Files.delete(Path.of("some/path"));
+                        return true;
+                    }).get()
+        );
+    }
 
     @Test
     public void runnable() {
