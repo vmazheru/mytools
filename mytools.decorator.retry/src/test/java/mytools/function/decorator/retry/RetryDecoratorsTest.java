@@ -2,6 +2,8 @@ package mytools.function.decorator.retry;
 
 import static mytools.function.decorator.retry.RetryDecorators.retried;
 import static mytools.function.decorator.retry.RetryDecorators.retriedWithException;
+import static mytools.function.decorator.retry.RetryDecorators.retry;
+import static mytools.function.decorator.retry.RetryDecorators.retryWithException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -816,6 +818,235 @@ public class RetryDecoratorsTest {
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg1, arg2));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+    }
+
+    @Test
+    public void runnableApplied() {
+        Shaky shaky = new Shaky();
+        Runnable bare = () -> shaky.sum(3, 5L);
+
+        retry(3, 10, bare);
+        assertTrue(shaky.wasExecuted());
+
+        retry(threeTimes.get(), bare);
+        assertTrue(shaky.wasExecuted());
+
+        retry(threeTimes.get(), Arrays.asList(), bare);
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                Arrays.asList(NullPointerException.class), bare).run());
+
+        retry(threeTimes.get(),
+                Arrays.asList(Shaky.RuntimeException.class), bare);
+        assertTrue(shaky.wasExecuted());
+
+        retry(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare);
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        retry(threeTimes.get(), ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep());
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
+
+        retry(threeTimes.get(), Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare);
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retried(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()).run());
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
+
+        retry(threeTimes.get(), Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep());
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+    }
+
+    @Test
+    public void runnableWithExceptionApplied() throws Shaky.Exception {
+        Shaky shaky = new Shaky();
+        RunnableWithException<Shaky.Exception> bare = () -> shaky.concat(3, 5L);
+
+        retryWithException(3, 10, bare);
+        assertTrue(shaky.wasExecuted());
+
+        retryWithException(threeTimes.get(), bare);
+        assertTrue(shaky.wasExecuted());
+
+        retryWithException(threeTimes.get(), Arrays.asList(), bare);
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retriedWithException(threeTimes.get(),
+                Arrays.asList(Shaky.UnrelatedException.class), bare).run());
+
+        retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class), bare);
+        assertTrue(shaky.wasExecuted());
+
+        retryWithException(
+                threeTimes.get(), ex -> shaky.beforeSleep(ex), bare);
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        retryWithException(
+                threeTimes.get(), ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep());
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retryWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+
+        retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare);
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retryWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
+
+        retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep());
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+        assertTrue(shaky.wasExecuted());
+    }
+
+    @Test
+    public void supplierApplied() {
+        Shaky shaky = new Shaky();
+        Supplier<String> bare = () -> shaky.sum(3, 5L);
+
+        assertEquals("8", retry(3, 10, bare));
+        assertEquals("8", retry(3, 10, bare));
+        assertEquals("8", retry(threeTimes.get(), bare));
+        assertEquals("8",
+                retry(threeTimes.get(), Arrays.asList(), bare));
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retry(threeTimes.get(),
+                Arrays.asList(NullPointerException.class), bare));
+        assertEquals("8", retry(threeTimes.get(),
+                Arrays.asList(Shaky.RuntimeException.class), bare));
+
+        assertEquals("8", retry(threeTimes.get(),
+                ex -> shaky.beforeSleep(ex), bare));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        assertEquals("8", retry(threeTimes.get(),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retry(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+
+        assertEquals("8", retry(threeTimes.get(),
+                Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        assertThrows(Shaky.RuntimeException.class,
+                () -> retry(threeTimes.get(),
+                        Arrays.asList(NullPointerException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
+
+        assertEquals("8", retry(threeTimes.get(),
+                Arrays.asList(Shaky.RuntimeException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+    }
+
+    @Test
+    public void supplierWithExceptionApplied() throws Shaky.Exception {
+        Shaky shaky = new Shaky();
+        SupplierWithException<String, Shaky.Exception> bare =
+                () -> shaky.concat(3, 5L);
+
+        assertEquals("35", retryWithException(3, 10, bare));
+        assertEquals("35", retryWithException(3, 10, bare));
+        assertEquals("35", retryWithException(threeTimes.get(), bare));
+        assertEquals("35", retryWithException(
+                threeTimes.get(), Arrays.asList(), bare));
+        assertThrows(Shaky.ConcatException.class,
+                () -> retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.UnrelatedException.class), bare));
+        assertEquals("35", retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class), bare));
+
+        assertEquals("35", retryWithException(threeTimes.get(),
+                ex -> shaky.beforeSleep(ex), bare));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        assertEquals("35", retryWithException(threeTimes.get(),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+        assertTrue(shaky.wasAfterSleepExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retryWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+
+        assertEquals("35", retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare));
+        assertTrue(shaky.wasBeforeSleepExecuted());
+
+        assertThrows(Shaky.ConcatException.class,
+                () -> retryWithException(threeTimes.get(),
+                        Arrays.asList(Shaky.UnrelatedException.class),
+                        ex -> shaky.beforeSleep(ex), bare,
+                        () -> shaky.afterSleep()));
+        assertFalse(shaky.wasBeforeSleepExecuted());
+        assertFalse(shaky.wasAfterSleepExecuted());
+
+        assertEquals("35", retryWithException(threeTimes.get(),
+                Arrays.asList(Shaky.ConcatException.class),
+                ex -> shaky.beforeSleep(ex), bare,
+                () -> shaky.afterSleep()));
         assertTrue(shaky.wasBeforeSleepExecuted());
         assertTrue(shaky.wasAfterSleepExecuted());
     }
