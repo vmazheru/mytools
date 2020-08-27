@@ -309,7 +309,8 @@ public interface RetryDecorators {
                 p, exceptionClasses, beforeSleep, afterSleep).decorate(f);
     }
 
-    static <T, E extends Exception> ConsumerWithException<T, E> retried(
+    static <T, E extends Exception> ConsumerWithException<T, E>
+    retriedWithException(
             int numRetries, long sleep, ConsumerWithException<T, E> f) {
         return retriedWithException(new LinearRetryPolicy(
                 numRetries, sleep), null, null, f, null);
