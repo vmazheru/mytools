@@ -31,27 +31,35 @@ import mytools.function.object.Counter;
 
 public class RetryDecoratorsTest {
 
+    private static final int THREE = 3;
+    private static final long TEN = 10L;
+    private static final long FIVE = 5L;
+
     private static class Shaky {
+
+        static final String SUM_RESULT = "8";
+        static final String CONCAT_RESULT = "35";
+
         private final Counter c = new Counter();
         private boolean beforeSleepExecuted;
         private boolean afterSleepExecuted;
         private boolean wasExecuted;
 
         @SuppressWarnings("serial")
-        static class RuntimeException extends java.lang.RuntimeException {}
+        static class RuntimeException extends java.lang.RuntimeException { }
 
         @SuppressWarnings("serial")
-        static class Exception extends java.lang.Exception {}
+        static class Exception extends java.lang.Exception { }
 
         @SuppressWarnings("serial")
-        static class ConcatException extends Exception {}
+        static class ConcatException extends Exception { }
 
         @SuppressWarnings("serial")
-        static class UnrelatedException extends Exception {}
+        static class UnrelatedException extends Exception { }
 
 
         String sum(Integer i, Long l) {
-            if (c.incrementAndGet() < 3) {
+            if (c.incrementAndGet() < THREE) {
                 throw new RuntimeException();
             }
             c.reset();
@@ -60,7 +68,7 @@ public class RetryDecoratorsTest {
         }
 
         String concat(Integer i, Long l) throws ConcatException {
-            if (c.incrementAndGet() < 3) {
+            if (c.incrementAndGet() < THREE) {
                 throw new ConcatException();
             }
             c.reset();
@@ -102,23 +110,24 @@ public class RetryDecoratorsTest {
     }
 
     private Supplier<RetryPolicy> threeTimes =
-            () -> new LinearRetryPolicy(3, 10);
+            () -> new LinearRetryPolicy(THREE, TEN);
 
     @Test
     public void examples() {
-        retry(3, 10, () -> System.out.println());
-        retry(3, 10, () -> 5);
+        retry(THREE, TEN, () -> System.out.println());
+        retry(THREE, TEN, () -> new java.util.Random().nextInt());
 
-        retried(3, 10, () -> System.out.println()).run();
-        retried(3, 10, () -> 5).get();
+        retried(THREE, TEN, () -> System.out.println()).run();
+        retried(THREE, TEN,
+                () -> new java.util.Random().nextInt()).get();
 
         assertThrows(IOException.class, () ->
-            retryWithException(
-                    3, 10, () -> Files.delete(Path.of("some/path")))
+            retryWithException(THREE, TEN,
+                    () -> Files.delete(Path.of("some/path")))
         );
 
         assertThrows(IOException.class, () ->
-            retryWithException(3, 10,
+            retryWithException(THREE, TEN,
                     () -> {
                         Files.delete(Path.of("some/path"));
                         return true;
@@ -126,12 +135,12 @@ public class RetryDecoratorsTest {
         );
 
         assertThrows(IOException.class, () ->
-            retriedWithException(
-                    3, 10, () -> Files.delete(Path.of("some/path"))).run()
+            retriedWithException(THREE, TEN,
+                    () -> Files.delete(Path.of("some/path"))).run()
         );
 
         assertThrows(IOException.class, () ->
-            retriedWithException(3, 10,
+            retriedWithException(THREE, TEN,
                     () -> {
                         Files.delete(Path.of("some/path"));
                         return true;
@@ -142,9 +151,9 @@ public class RetryDecoratorsTest {
     @Test
     public void runnable() {
         Shaky shaky = new Shaky();
-        Runnable bare = () -> shaky.sum(3, 5L);
+        Runnable bare = () -> shaky.sum(THREE, FIVE);
 
-        retried(3, 10, bare).run();
+        retried(THREE, TEN, bare).run();
         assertTrue(shaky.wasExecuted());
 
         retried(threeTimes.get(), bare).run();
@@ -201,9 +210,10 @@ public class RetryDecoratorsTest {
     @Test
     public void runnableWithException() throws Shaky.Exception {
         Shaky shaky = new Shaky();
-        RunnableWithException<Shaky.Exception> bare = () -> shaky.concat(3, 5L);
+        RunnableWithException<Shaky.Exception> bare =
+                () -> shaky.concat(THREE, FIVE);
 
-        retriedWithException(3, 10, bare).run();
+        retriedWithException(THREE, TEN, bare).run();
         assertTrue(shaky.wasExecuted());
 
         retriedWithException(threeTimes.get(), bare).run();
@@ -264,24 +274,27 @@ public class RetryDecoratorsTest {
     @Test
     public void supplier() {
         Shaky shaky = new Shaky();
-        Supplier<String> bare = () -> shaky.sum(3, 5L);
+        Supplier<String> bare = () -> shaky.sum(THREE, FIVE);
 
-        assertEquals("8", retried(3, 10, bare).get());
-        assertEquals("8", retried(3, 10, bare).get());
-        assertEquals("8", retried(threeTimes.get(), bare).get());
-        assertEquals("8",
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).get());
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).get());
+        assertEquals(Shaky.SUM_RESULT,
+                retried(threeTimes.get(), bare).get());
+        assertEquals(Shaky.SUM_RESULT,
                 retried(threeTimes.get(), Arrays.asList(), bare).get());
         assertThrows(Shaky.RuntimeException.class,
                 () -> retried(threeTimes.get(),
                 Arrays.asList(NullPointerException.class), bare).get());
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class), bare).get());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -293,7 +306,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).get());
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -306,7 +319,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).get());
@@ -318,24 +331,27 @@ public class RetryDecoratorsTest {
     public void supplierWithException() throws Shaky.Exception {
         Shaky shaky = new Shaky();
         SupplierWithException<String, Shaky.Exception> bare =
-                () -> shaky.concat(3, 5L);
+                () -> shaky.concat(THREE, FIVE);
 
-        assertEquals("35", retriedWithException(3, 10, bare).get());
-        assertEquals("35", retriedWithException(3, 10, bare).get());
-        assertEquals("35", retriedWithException(threeTimes.get(), bare).get());
-        assertEquals("35", retriedWithException(
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare).get());
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare).get());
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(threeTimes.get(), bare).get());
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(
                 threeTimes.get(), Arrays.asList(), bare).get());
         assertThrows(Shaky.ConcatException.class,
                 () -> retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.UnrelatedException.class), bare).get());
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class), bare).get());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -347,7 +363,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).get());
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare).get());
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -360,7 +376,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).get());
@@ -371,10 +387,10 @@ public class RetryDecoratorsTest {
     @Test
     public void consumer() {
         Shaky shaky = new Shaky();
-        Consumer<Long> bare = arg -> shaky.sum(3, arg);
-        Long arg = 5L;
+        Consumer<Long> bare = arg -> shaky.sum(THREE, arg);
+        Long arg = FIVE;
 
-        retried(3, 10, bare).accept(arg);
+        retried(THREE, TEN, bare).accept(arg);
         assertTrue(shaky.wasExecuted());
 
         retried(threeTimes.get(), bare).accept(arg);
@@ -433,10 +449,10 @@ public class RetryDecoratorsTest {
     public void consumerWithException() throws Shaky.Exception {
         Shaky shaky = new Shaky();
         ConsumerWithException<Long, Shaky.Exception> bare =
-                arg -> shaky.concat(3, arg);
-        Long arg = 5L;
+                arg -> shaky.concat(THREE, arg);
+        Long arg = FIVE;
 
-        retriedWithException(3, 10, bare).accept(arg);
+        retriedWithException(THREE, TEN, bare).accept(arg);
         assertTrue(shaky.wasExecuted());
 
         retriedWithException(threeTimes.get(), bare).accept(arg);
@@ -501,10 +517,10 @@ public class RetryDecoratorsTest {
     public void biConsumer() {
         Shaky shaky = new Shaky();
         BiConsumer<Integer, Long> bare = (arg1, arg2) -> shaky.sum(arg1, arg2);
-        Integer arg1 = 3;
-        Long arg2 = 5L;
+        Integer arg1 = THREE;
+        Long arg2 = FIVE;
 
-        retried(3, 10, bare).accept(arg1, arg2);
+        retried(THREE, TEN, bare).accept(arg1, arg2);
         assertTrue(shaky.wasExecuted());
 
         retried(threeTimes.get(), bare).accept(arg1, arg2);
@@ -566,10 +582,10 @@ public class RetryDecoratorsTest {
         Shaky shaky = new Shaky();
         BiConsumerWithException<Integer, Long, Shaky.Exception> bare =
                 (arg1, arg2) -> shaky.concat(arg1, arg2);
-        Integer arg1 = 3;
-        Long arg2 = 5L;
+        Integer arg1 = THREE;
+        Long arg2 = FIVE;
 
-        retriedWithException(3, 10, bare).accept(arg1, arg2);
+        retriedWithException(THREE, TEN, bare).accept(arg1, arg2);
         assertTrue(shaky.wasExecuted());
 
         retriedWithException(threeTimes.get(), bare).accept(arg1, arg2);
@@ -634,25 +650,28 @@ public class RetryDecoratorsTest {
     @Test
     public void function() {
         Shaky shaky = new Shaky();
-        Function<Long, String> bare = arg -> shaky.sum(3, arg);
-        Long arg = 5L;
+        Function<Long, String> bare = arg -> shaky.sum(THREE, arg);
+        Long arg = FIVE;
 
-        assertEquals("8", retried(3, 10, bare).apply(arg));
-        assertEquals("8", retried(3, 10, bare).apply(arg));
-        assertEquals("8", retried(threeTimes.get(), bare).apply(arg));
-        assertEquals("8",
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).apply(arg));
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).apply(arg));
+        assertEquals(Shaky.SUM_RESULT,
+                retried(threeTimes.get(), bare).apply(arg));
+        assertEquals(Shaky.SUM_RESULT,
                 retried(threeTimes.get(), Arrays.asList(), bare).apply(arg));
         assertThrows(Shaky.RuntimeException.class,
                 () -> retried(threeTimes.get(),
                 Arrays.asList(NullPointerException.class), bare).apply(arg));
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class), bare).apply(arg));
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -664,7 +683,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -677,7 +696,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg));
@@ -689,27 +708,29 @@ public class RetryDecoratorsTest {
     public void functionWithException() throws Shaky.Exception {
         Shaky shaky = new Shaky();
         FunctionWithException<Long, String, Shaky.Exception> bare =
-                arg -> shaky.concat(3, arg);
-        Long arg = 5L;
+                arg -> shaky.concat(THREE, arg);
+        Long arg = FIVE;
 
-        assertEquals("35", retriedWithException(3, 10, bare).apply(arg));
-        assertEquals("35", retriedWithException(3, 10, bare).apply(arg));
-        assertEquals("35",
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare).apply(arg));
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare).apply(arg));
+        assertEquals(Shaky.CONCAT_RESULT,
                 retriedWithException(threeTimes.get(), bare).apply(arg));
-        assertEquals("35", retriedWithException(
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(
                 threeTimes.get(), Arrays.asList(), bare).apply(arg));
         assertThrows(Shaky.ConcatException.class,
                 () -> retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.UnrelatedException.class), bare)
                 .apply(arg));
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class), bare).apply(arg));
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -721,7 +742,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -734,7 +755,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg));
@@ -747,28 +768,31 @@ public class RetryDecoratorsTest {
         Shaky shaky = new Shaky();
         BiFunction<Integer, Long, String> bare =
                 (arg1, arg2) -> shaky.sum(arg1, arg2);
-        Integer arg1 = 3;
-        Long arg2 = 5L;
+        Integer arg1 = THREE;
+        Long arg2 = FIVE;
 
-        assertEquals("8", retried(3, 10, bare).apply(arg1, arg2));
-        assertEquals("8", retried(3, 10, bare).apply(arg1, arg2));
-        assertEquals("8", retried(threeTimes.get(), bare).apply(arg1, arg2));
-        assertEquals("8",
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).apply(arg1, arg2));
+        assertEquals(Shaky.SUM_RESULT,
+                retried(THREE, TEN, bare).apply(arg1, arg2));
+        assertEquals(Shaky.SUM_RESULT,
+                retried(threeTimes.get(), bare).apply(arg1, arg2));
+        assertEquals(Shaky.SUM_RESULT,
                 retried(threeTimes.get(), Arrays.asList(), bare)
                 .apply(arg1, arg2));
         assertThrows(Shaky.RuntimeException.class,
                 () -> retried(threeTimes.get(),
                 Arrays.asList(NullPointerException.class), bare)
                 .apply(arg1, arg2));
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class), bare)
                 .apply(arg1, arg2));
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -780,7 +804,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -793,7 +817,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("8", retried(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retried(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg1, arg2));
@@ -805,29 +829,33 @@ public class RetryDecoratorsTest {
     public void biFunctionWithException() throws Shaky.Exception {
         Shaky shaky = new Shaky();
         BiFunctionWithException<Integer, Long, String, Shaky.Exception> bare =
-                (arg1, arg2) -> shaky.concat(3, 5L);
-        Integer arg1 = 3;
-        Long arg2 = 5L;
+                (arg1, arg2) -> shaky.concat(THREE, FIVE);
+        Integer arg1 = THREE;
+        Long arg2 = FIVE;
 
-        assertEquals("35", retriedWithException(3, 10, bare).apply(arg1, arg2));
-        assertEquals("35", retriedWithException(3, 10, bare).apply(arg1, arg2));
-        assertEquals("35",
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare)
+                .apply(arg1, arg2));
+        assertEquals(Shaky.CONCAT_RESULT,
+                retriedWithException(THREE, TEN, bare)
+                .apply(arg1, arg2));
+        assertEquals(Shaky.CONCAT_RESULT,
                 retriedWithException(threeTimes.get(), bare).apply(arg1, arg2));
-        assertEquals("35", retriedWithException(
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(
                 threeTimes.get(), Arrays.asList(), bare).apply(arg1, arg2));
         assertThrows(Shaky.ConcatException.class,
                 () -> retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.UnrelatedException.class), bare)
                 .apply(arg1, arg2));
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class), bare)
                 .apply(arg1, arg2));
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -839,7 +867,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare).apply(arg1, arg2));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -852,7 +880,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("35", retriedWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retriedWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()).apply(arg1, arg2));
@@ -863,9 +891,9 @@ public class RetryDecoratorsTest {
     @Test
     public void runnableApplied() {
         Shaky shaky = new Shaky();
-        Runnable bare = () -> shaky.sum(3, 5L);
+        Runnable bare = () -> shaky.sum(THREE, FIVE);
 
-        retry(3, 10, bare);
+        retry(THREE, TEN, bare);
         assertTrue(shaky.wasExecuted());
 
         retry(threeTimes.get(), bare);
@@ -922,9 +950,10 @@ public class RetryDecoratorsTest {
     @Test
     public void runnableWithExceptionApplied() throws Shaky.Exception {
         Shaky shaky = new Shaky();
-        RunnableWithException<Shaky.Exception> bare = () -> shaky.concat(3, 5L);
+        RunnableWithException<Shaky.Exception> bare =
+                () -> shaky.concat(THREE, FIVE);
 
-        retryWithException(3, 10, bare);
+        retryWithException(THREE, TEN, bare);
         assertTrue(shaky.wasExecuted());
 
         retryWithException(threeTimes.get(), bare);
@@ -985,24 +1014,24 @@ public class RetryDecoratorsTest {
     @Test
     public void supplierApplied() {
         Shaky shaky = new Shaky();
-        Supplier<String> bare = () -> shaky.sum(3, 5L);
+        Supplier<String> bare = () -> shaky.sum(THREE, FIVE);
 
-        assertEquals("8", retry(3, 10, bare));
-        assertEquals("8", retry(3, 10, bare));
-        assertEquals("8", retry(threeTimes.get(), bare));
-        assertEquals("8",
+        assertEquals(Shaky.SUM_RESULT, retry(THREE, TEN, bare));
+        assertEquals(Shaky.SUM_RESULT, retry(THREE, TEN, bare));
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(), bare));
+        assertEquals(Shaky.SUM_RESULT,
                 retry(threeTimes.get(), Arrays.asList(), bare));
         assertThrows(Shaky.RuntimeException.class,
                 () -> retry(threeTimes.get(),
                 Arrays.asList(NullPointerException.class), bare));
-        assertEquals("8", retry(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class), bare));
 
-        assertEquals("8", retry(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retry(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -1014,7 +1043,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("8", retry(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -1027,7 +1056,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("8", retry(threeTimes.get(),
+        assertEquals(Shaky.SUM_RESULT, retry(threeTimes.get(),
                 Arrays.asList(Shaky.RuntimeException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()));
@@ -1039,24 +1068,27 @@ public class RetryDecoratorsTest {
     public void supplierWithExceptionApplied() throws Shaky.Exception {
         Shaky shaky = new Shaky();
         SupplierWithException<String, Shaky.Exception> bare =
-                () -> shaky.concat(3, 5L);
+                () -> shaky.concat(THREE, FIVE);
 
-        assertEquals("35", retryWithException(3, 10, bare));
-        assertEquals("35", retryWithException(3, 10, bare));
-        assertEquals("35", retryWithException(threeTimes.get(), bare));
-        assertEquals("35", retryWithException(
+        assertEquals(Shaky.CONCAT_RESULT,
+                retryWithException(THREE, TEN, bare));
+        assertEquals(Shaky.CONCAT_RESULT,
+                retryWithException(THREE, TEN, bare));
+        assertEquals(Shaky.CONCAT_RESULT,
+                retryWithException(threeTimes.get(), bare));
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(
                 threeTimes.get(), Arrays.asList(), bare));
         assertThrows(Shaky.ConcatException.class,
                 () -> retryWithException(threeTimes.get(),
                 Arrays.asList(Shaky.UnrelatedException.class), bare));
-        assertEquals("35", retryWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class), bare));
 
-        assertEquals("35", retryWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare));
         assertTrue(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retryWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(threeTimes.get(),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -1068,7 +1100,7 @@ public class RetryDecoratorsTest {
                         ex -> shaky.beforeSleep(ex), bare));
         assertFalse(shaky.wasBeforeSleepExecuted());
 
-        assertEquals("35", retryWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare));
         assertTrue(shaky.wasBeforeSleepExecuted());
@@ -1081,7 +1113,7 @@ public class RetryDecoratorsTest {
         assertFalse(shaky.wasBeforeSleepExecuted());
         assertFalse(shaky.wasAfterSleepExecuted());
 
-        assertEquals("35", retryWithException(threeTimes.get(),
+        assertEquals(Shaky.CONCAT_RESULT, retryWithException(threeTimes.get(),
                 Arrays.asList(Shaky.ConcatException.class),
                 ex -> shaky.beforeSleep(ex), bare,
                 () -> shaky.afterSleep()));

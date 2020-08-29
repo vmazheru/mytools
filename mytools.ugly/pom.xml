@@ -57,6 +57,11 @@
       <artifactId>mytools.util</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mytools.decorator.retry</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>

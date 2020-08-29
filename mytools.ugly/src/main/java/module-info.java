@@ -5,4 +5,5 @@ module mytools.ugly {
     requires mytools.strinparser;
     requires mytools.test;
     requires mytools.util;
+    requires mytools.decorator.retry;
 }
