@@ -35,7 +35,7 @@ public class DecoratorTest {
          * @see Decorator#decorate(java.util.function.BiFunction)
          */
         @Override
-        public BiFunction<T, U, R> decorate(BiFunction<T, U, R> f) {
+        public BiFunction<? super T, ? super U, ? extends R> decorate(BiFunction<? super T, ? super U, ? extends R> f) {
             return (t, u) -> {
                 counter.increment();
                 return f.apply(t, u);

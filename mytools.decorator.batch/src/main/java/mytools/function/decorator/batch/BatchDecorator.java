@@ -7,21 +7,15 @@ import java.util.function.BiFunction;
 
 import mytools.function.decorator.Decorator;
 
-
-
 /**
- * Implementation of {@link Decorator} interface which processes collections in
- * fixed size batches.
+ * This decorator takes a function which maps {@code java.util.List} object
+ * into a list of different type, and executes it in batches of the given size.
  *
- * @param <T>  type of objects which the input collection contains
- * @param <U>  type of the second parameter passed to the decorator
- *             (beside the collection object itself)
- * @param <R>  type of the objects which the resulting list will have
- * @param <I>  type of the collection which must extend
- *             {@code java.lang.Iterable}
+ * @param <T> type of elements in the input list
+ * @param <U> second parameter to the function
+ * @param <R> type of elements in the output list
  */
-class BatchDecorator<T, U, R, I extends Iterable<T>>
-    implements Decorator<I, U, List<R>> {
+class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
 
     private final int batchSize;
 
@@ -30,69 +24,31 @@ class BatchDecorator<T, U, R, I extends Iterable<T>>
     }
 
     @Override
-    public BiFunction<I, U, List<R>> decorate(BiFunction<I, U, List<R>> f) {
-        return (iterable, u) -> {
-            if (iterable == null) {
+    public BiFunction<List<T>, U, List<R>> decorate(
+            BiFunction<? super List<T>, ? super U, ? extends List<R>> f) {
+        return (list, u) -> {
+            if (list == null) {
                 throw new IllegalArgumentException(
                         "null list passed to a function");
             }
 
-            if (!iterable.iterator().hasNext()) {
+            if (list.isEmpty()) {
                 return Collections.emptyList();
             }
 
-            if (iterable instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<T> castedIterable = (List<T>)iterable;
-                return processList(castedIterable, u, f);
+            List<R> result = new ArrayList<>();
+            int size = list.size();
+            int start = 0;
+            int end = Math.min(batchSize, size);
+
+            while (start < size) {
+                result.addAll(f.apply(list.subList(start, end), u));
+                start = end;
+                end = Math.min(end + batchSize, size);
             }
-            return processIterable(iterable, u, f);
+
+            return result.isEmpty() ? null : result;
         };
-    }
 
-    @SuppressWarnings("unchecked")
-    private List<R> processIterable(
-            I input, U u, BiFunction<I, U, List<R>> f) {
-        List<R> result = new ArrayList<>();
-
-        int i = 0;
-        List<T> group = new ArrayList<>(batchSize);
-        for (T t : input) {
-            if (i >= batchSize) {
-                addAllSafely(result, f.apply((I)group, u));
-                group = new ArrayList<>(batchSize);
-                i = 0;
-            }
-            group.add(t);
-            i++;
-        }
-
-        if (!group.isEmpty()) {
-            addAllSafely(result, f.apply((I)group, u));
-        }
-
-        return result.isEmpty() ? null : result;
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<R> processList(
-            List<T> list, U u, BiFunction<I, U, List<R>> f) {
-        List<R> result = new ArrayList<>();
-        int size = list.size();
-        int start = 0;
-        int end = Math.min(batchSize, size);
-
-        while (start < size) {
-            addAllSafely(result, f.apply((I)list.subList(start, end), u));
-            start = end;
-            end = Math.min(end + batchSize, size);
-        }
-        return result.isEmpty() ? null : result;
-    }
-
-    protected static <T> void addAllSafely(List<T> dest, Iterable<T> src) {
-        if (src != null) {
-            for (T t : src) dest.add(t);
-        }
     }
 }

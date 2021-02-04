@@ -79,8 +79,8 @@ final class RetryDecorator<T, U, R, E extends Exception>
      * </ol>
      */
     @Override
-    public BiFunctionWithException<T, U, R, E> decorate(
-            BiFunctionWithException<T, U, R, E> f) {
+    public BiFunctionWithException<? super T, ? super U, ? extends R, E> decorate(
+            BiFunctionWithException<? super T, ? super U, ? extends R, E> f) {
         return (t, u) -> {
             while (true) {
                 try {
