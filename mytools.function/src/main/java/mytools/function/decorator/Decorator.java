@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  *
  * <pre>
  * {
- *     &#64;code
+ *     @code
  *     public class DelayDecorator implements Decorator {
  *         public <T, U, R> BiFunction<T, U, R> decorate(BiFunction<T, U, R> f)
  *         {
@@ -74,21 +74,21 @@ public interface Decorator<T, U, R> {
         return toR(decorate(toBF(f)));
     }
 
-    default Supplier<? extends R> decorate(Supplier<? extends R> f) {
+    default Supplier<R> decorate(Supplier<R> f) {
         return toS(decorate(toBF(f)));
     }
 
-    default Consumer<? super T> decorate(Consumer<? super T> f) {
+    default Consumer<T> decorate(Consumer<T> f) {
         return toC(decorate(toBF(f)));
     }
 
-    default Function<? super T, ? extends R> decorate(Function<? super T, ? extends R> f) {
+    default Function<T, R> decorate(Function<T, R> f) {
         return toF(decorate(toBF(f)));
     }
 
-    default BiConsumer<? super T, ? super U> decorate(BiConsumer<? super T, ? super U> f) {
+    default BiConsumer<T, U> decorate(BiConsumer<T, U> f) {
         return toBC(decorate(toBF(f)));
     }
 
-    BiFunction<? super T, ? super U, ? extends R> decorate(BiFunction<? super T, ? super U, ? extends R> f);
+    BiFunction<T, U, R> decorate(BiFunction<T, U, R> f);
 }

@@ -49,7 +49,7 @@ final class RetryDecorator<T, U, R, E extends Exception>
     RetryDecorator(
             RetryPolicy retryPolicy,
             List<Class<? extends E>> exceptionClasses,
-            Consumer<? super E> before,
+            Consumer<E> before,
             Runnable after) {
         this.retryPolicy = retryPolicy;
         this.exceptionClasses = exceptionClasses;
@@ -79,8 +79,8 @@ final class RetryDecorator<T, U, R, E extends Exception>
      * </ol>
      */
     @Override
-    public BiFunctionWithException<? super T, ? super U, ? extends R, E> decorate(
-            BiFunctionWithException<? super T, ? super U, ? extends R, E> f) {
+    public BiFunctionWithException<T, U, R, E> decorate(
+            BiFunctionWithException<T, U, R, E> f) {
         return (t, u) -> {
             while (true) {
                 try {

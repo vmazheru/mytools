@@ -11,7 +11,7 @@ abstract class AbstractExceptionHandlingDecorator<T, U, R, E extends Exception>
     implements ExceptionHidingDecorator<T, U, R, E> {
 
     @Override
-    public BiFunction<? super T, ? super U, ? extends R> decorate(BiFunctionWithException<? super T, ? super U, ? extends R, E> f) {
+    public BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R, E> f) {
         return (t, u) -> {
             try {
                 return f.apply(t, u);

@@ -1,9 +1,13 @@
 package mytools.function.decorator.batch;
 
+import static mytools.function.Conversions.toBF;
+import static mytools.function.Conversions.toC;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import mytools.function.decorator.Decorator;
 
@@ -24,8 +28,13 @@ class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
     }
 
     @Override
+    public Consumer<List<T>> decorate(Consumer<List<T>> f) {
+        return toC(decorate(toBF(f)));
+    }
+
+    @Override
     public BiFunction<List<T>, U, List<R>> decorate(
-            BiFunction<? super List<T>, ? super U, ? extends List<R>> f) {
+            BiFunction<List<T>, U, List<R>> f) {
         return (list, u) -> {
             if (list == null) {
                 throw new IllegalArgumentException(

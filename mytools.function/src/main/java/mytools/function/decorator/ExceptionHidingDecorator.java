@@ -33,21 +33,21 @@ public interface ExceptionHidingDecorator<T, U, R, E extends Exception> {
         return toR(decorate(toBF(f)));
     }
 
-    default Supplier<? extends R> decorate(SupplierWithException<? extends R, E> f) {
+    default Supplier<R> decorate(SupplierWithException<R, E> f) {
         return toS(decorate(toBF(f)));
     }
 
-    default Consumer<? super T> decorate(ConsumerWithException<? super T, E> f) {
+    default Consumer<T> decorate(ConsumerWithException<T, E> f) {
         return toC(decorate(toBF(f)));
     }
 
-    default Function<? super T, ? extends R> decorate(FunctionWithException<? super T, ? extends R, E> f) {
+    default Function<T, R> decorate(FunctionWithException<T, R, E> f) {
         return toF(decorate(toBF(f)));
     }
 
-    default BiConsumer<? super T, ? super U> decorate(BiConsumerWithException<? super T, ? super U, E> f) {
+    default BiConsumer<T, U> decorate(BiConsumerWithException<T, U, E> f) {
         return toBC(decorate(toBF(f)));
     }
 
-    BiFunction<? super T, ? super U, ? extends R> decorate(BiFunctionWithException<? super T, ? super U, ? extends R, E> f);
+    BiFunction<T, U, R> decorate(BiFunctionWithException<T, U, R, E> f);
 }
