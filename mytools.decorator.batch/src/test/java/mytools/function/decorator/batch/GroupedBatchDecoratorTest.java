@@ -13,12 +13,15 @@ public class GroupedBatchDecoratorTest {
 
     @Test
     public void applesAndOranges() {
+        final int batchSize = 5;
+
         List<String> applesAndOranges = Arrays.asList(
                 "Apple 1", "Apple 2", "Avocado 1",
                 "Orange 1", "Orange 2", "Orange 3", "Orange 4", "Orange 5");
 
         GroupedBatchDecorator<String, Object, String, String> d =
-                new GroupedBatchDecorator<>(5, true, s -> s.split(" ")[0]);
+                new GroupedBatchDecorator<>(
+                        batchSize, true, s -> s.split(" ")[0]);
 
         List<List<String>> batches = new ArrayList<>();
 

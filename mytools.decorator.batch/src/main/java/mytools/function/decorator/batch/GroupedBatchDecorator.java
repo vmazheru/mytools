@@ -29,14 +29,15 @@ import mytools.function.decorator.Decorator;
  * @param <C>  type of the output of the group function
  */
 class GroupedBatchDecorator <T, U, R, C extends Comparable<C>>
-    extends BatchDecorator<T, U, R> {
+    implements Decorator<List<T>, U, List<R>> {
 
     private final boolean inputSorted;
-    private final Function<T,C> groupFunction;
+    private final Function<T, C> groupFunction;
+    private final int batchSize;
 
     GroupedBatchDecorator(
-            int batchSize, boolean inputSorted, Function<T,C> groupFunction) {
-        super(batchSize);
+            int batchSize, boolean inputSorted, Function<T, C> groupFunction) {
+        this.batchSize = batchSize;
         this.inputSorted = inputSorted;
         this.groupFunction = groupFunction;
     }

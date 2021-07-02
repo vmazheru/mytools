@@ -87,6 +87,7 @@
     <module>mytools.util</module>
     <module>mytools.function</module>
     <module>mytools.decorator.retry</module>
+    <module>mytools.decorator.batch</module>
     <module>mytools.test</module>
     <module>mytools.collectionutil</module>
     <module>mytools.stringparser</module>

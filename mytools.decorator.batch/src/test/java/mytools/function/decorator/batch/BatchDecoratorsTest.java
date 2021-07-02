@@ -20,8 +20,8 @@ public class BatchDecoratorsTest {
 
     @Test
     public void batchedConsumer() {
-        int batchSize = 3;
-        List<Integer> ints = Arrays.asList(0,1,2,3,4,5,6,7,8,9);
+        final int batchSize = 3;
+        final List<Integer> ints = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 
         Counter numProcessed = new Counter();
 
@@ -40,7 +40,7 @@ public class BatchDecoratorsTest {
 
     @Test
     public void batchedConsumerWithGroupFunctionAndSortedInput() {
-        int batchSize = 5;
+        final int batchSize = 5;
         List<String> fruits = Arrays.asList(
                 "Apple 1", "Apple 2", "Avocado 1",
                 "Orange 1", "Orange 2", "Orange 3", "Orange 4", "Orange 5");
@@ -65,7 +65,7 @@ public class BatchDecoratorsTest {
 
     @Test
     public void batchedConsumerWithGroupFunctionAndNotSortedInput() {
-        int batchSize = 5;
+        final int batchSize = 5;
         List<String> fruits = Arrays.asList(
                 "Apple 1", "Apple 2", "Avocado 1",
                 "Orange 1", "Orange 2", "Orange 3", "Orange 4", "Orange 5");

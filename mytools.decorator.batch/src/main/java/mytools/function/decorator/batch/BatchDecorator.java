@@ -17,7 +17,7 @@ import mytools.function.decorator.Decorator;
  */
 class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
 
-    protected final int batchSize;
+    private final int batchSize;
 
     BatchDecorator(int batchSize) {
         this.batchSize = batchSize;
@@ -53,4 +53,5 @@ class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
             return result.isEmpty() ? null : result;
         };
     }
+
 }
