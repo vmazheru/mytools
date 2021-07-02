@@ -20,24 +20,25 @@ public class PairTest {
     public void equalsAndHashCodeAreImplemented() {
         Pair<Pair<Integer, List<String>>, Pair<Integer, List<String>>> pairs =
                 getPairWithCopy();
-        ObjectTests.equalsAndHashCodeAreImplemented(pairs._1(), pairs._2());
+        ObjectTests.equalsAndHashCodeAreImplemented(
+                pairs.getFirst(), pairs.getSecond());
     }
 
     @Test
     public void toStringIsImplemented() {
         Pair<Pair<Integer, List<String>>, Pair<Integer, List<String>>> pairs =
                 getPairWithCopy();
-        ObjectTests.toStringIsImplemented(pairs._1(), pairs._2());
+        ObjectTests.toStringIsImplemented(pairs.getFirst(), pairs.getSecond());
     }
 
     @Test
     public void pairAsArray() {
-        Pair<Integer, List<String>> p = getPairWithCopy()._1();
+        Pair<Integer, List<String>> p = getPairWithCopy().getFirst();
         Object[] objects = p.asArray();
         assertNotNull(objects);
         assertEquals(2, objects.length);
-        assertEquals(p._1(), objects[0]);
-        assertEquals(p._2(), objects[1]);
+        assertEquals(p.getFirst(), objects[0]);
+        assertEquals(p.getSecond(), objects[1]);
     }
 
     @Test
@@ -47,8 +48,8 @@ public class PairTest {
         List<Integer> integers = Pair.asList(p);
         assertNotNull(integers);
         assertEquals(PAIR_SIZE, integers.size());
-        assertEquals(p._1(), integers.get(0));
-        assertEquals(p._2(), integers.get(1));
+        assertEquals(p.getFirst(), integers.get(0));
+        assertEquals(p.getSecond(), integers.get(1));
     }
 
     private static Pair<Pair<Integer, List<String>>,

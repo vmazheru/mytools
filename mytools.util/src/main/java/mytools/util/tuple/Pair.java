@@ -14,20 +14,12 @@ public final class Pair<T, U> {
         this.second = second;
     }
 
-    public T _1() {
+    public T getFirst() {
         return first;
     }
 
-    public U _2() {
-        return second;
-    }
-
-    public T getFirst() {
-        return _1();
-    }
-
     public U getSecond() {
-        return _2();
+        return second;
     }
 
     public Object[] asArray() {
@@ -35,7 +27,7 @@ public final class Pair<T, U> {
     }
 
     public static <T> List<T> asList(Pair<T, T> pair) {
-        return Arrays.<T>asList(pair._1(), pair._2());
+        return Arrays.<T>asList(pair.getFirst(), pair.getSecond());
     }
 
     @Override

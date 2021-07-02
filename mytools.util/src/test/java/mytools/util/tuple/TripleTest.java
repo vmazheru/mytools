@@ -21,7 +21,8 @@ public class TripleTest {
         Pair<Triple<Integer, String, List<String>>,
              Triple<Integer, String, List<String>>> triples =
                 getTripleWithCopy();
-        ObjectTests.equalsAndHashCodeAreImplemented(triples._1(), triples._2());
+        ObjectTests.equalsAndHashCodeAreImplemented(
+                triples.getFirst(), triples.getSecond());
     }
 
     @Test
@@ -29,18 +30,20 @@ public class TripleTest {
         Pair<Triple<Integer, String, List<String>>,
              Triple<Integer, String, List<String>>> triples =
                 getTripleWithCopy();
-        ObjectTests.toStringIsImplemented(triples._1(), triples._2());
+        ObjectTests.toStringIsImplemented(
+                triples.getFirst(), triples.getSecond());
     }
 
     @Test
     public void tripleAsArray() {
-        Triple<Integer, String, List<String>> t = getTripleWithCopy()._1();
+        Triple<Integer, String, List<String>> t =
+                getTripleWithCopy().getFirst();
         Object[] objects = t.asArray();
         assertNotNull(objects);
         assertEquals(TRIPLE_SIZE, objects.length);
-        assertEquals(t._1(), objects[0]);
-        assertEquals(t._2(), objects[1]);
-        assertEquals(t._3(), objects[2]);
+        assertEquals(t.getFirst(), objects[0]);
+        assertEquals(t.getSecond(), objects[1]);
+        assertEquals(t.getThird(), objects[2]);
     }
 
     @Test
@@ -52,9 +55,9 @@ public class TripleTest {
         List<Integer> integers = Triple.asList(t);
         assertNotNull(integers);
         assertEquals(TRIPLE_SIZE, integers.size());
-        assertEquals(t._1(), integers.get(0));
-        assertEquals(t._2(), integers.get(1));
-        assertEquals(t._3(), integers.get(2));
+        assertEquals(t.getFirst(), integers.get(0));
+        assertEquals(t.getSecond(), integers.get(1));
+        assertEquals(t.getThird(), integers.get(2));
     }
 
     private static Pair<Triple<Integer, String, List<String>>,

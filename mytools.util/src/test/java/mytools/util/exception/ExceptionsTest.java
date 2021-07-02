@@ -21,12 +21,13 @@ public class ExceptionsTest {
     @Test
     public void getRootCauseWithNestedExceptions() {
         Pair<Exception, Exception> exWithRoot = exceptionWithItsRoot();
-        assertEquals(exWithRoot._2(), getRootCause(exWithRoot._1()));
+        assertEquals(exWithRoot.getSecond(),
+                getRootCause(exWithRoot.getFirst()));
     }
 
     @Test
     public void getStackTraceOfTheTopLevelException() {
-        Exception ex = exceptionWithItsRoot()._1();
+        Exception ex = exceptionWithItsRoot().getFirst();
         assertTrue(getStackTrace(ex).startsWith(
                 "java.lang.Exception: " + ex.getMessage()));
     }
@@ -34,8 +35,8 @@ public class ExceptionsTest {
     @Test
     public void getStackTraceOfRootException() {
         Pair<Exception, Exception> exWithRoot = exceptionWithItsRoot();
-        assertTrue(getRootStackTrace(exWithRoot._1()).startsWith(
-                "java.lang.Exception: " + exWithRoot._2().getMessage()));
+        assertTrue(getRootStackTrace(exWithRoot.getFirst()).startsWith(
+                "java.lang.Exception: " + exWithRoot.getSecond().getMessage()));
     }
 
     private static Pair<Exception, Exception> exceptionWithItsRoot() {

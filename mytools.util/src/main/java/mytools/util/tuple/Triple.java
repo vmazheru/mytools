@@ -16,28 +16,16 @@ public final class Triple<T, U, R> {
         this.third = third;
     }
 
-    public T _1() {
+    public T getFirst() {
         return first;
     }
 
-    public U _2() {
+    public U getSecond() {
         return second;
     }
 
-    public R _3() {
-        return third;
-    }
-
-    public T getFirst() {
-        return _1();
-    }
-
-    public U getSecond() {
-        return _2();
-    }
-
     public R getThird() {
-        return _3();
+        return third;
     }
 
     public Object[] asArray() {
@@ -45,7 +33,7 @@ public final class Triple<T, U, R> {
     }
 
     public static <T> List<T> asList(Triple<T, T, T> t) {
-        return Arrays.<T>asList(t._1(), t._2(), t._3());
+        return Arrays.<T>asList(t.getFirst(), t.getSecond(), t.getThird());
     }
 
     @Override

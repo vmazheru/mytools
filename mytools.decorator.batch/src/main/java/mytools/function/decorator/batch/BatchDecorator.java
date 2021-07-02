@@ -1,13 +1,9 @@
 package mytools.function.decorator.batch;
 
-import static mytools.function.Conversions.toBF;
-import static mytools.function.Conversions.toC;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import mytools.function.decorator.Decorator;
 
@@ -21,15 +17,10 @@ import mytools.function.decorator.Decorator;
  */
 class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
 
-    private final int batchSize;
+    protected final int batchSize;
 
     BatchDecorator(int batchSize) {
         this.batchSize = batchSize;
-    }
-
-    @Override
-    public Consumer<List<T>> decorate(Consumer<List<T>> f) {
-        return toC(decorate(toBF(f)));
     }
 
     @Override
@@ -51,13 +42,15 @@ class BatchDecorator<T, U, R> implements Decorator<List<T>, U, List<R>> {
             int end = Math.min(batchSize, size);
 
             while (start < size) {
-                result.addAll(f.apply(list.subList(start, end), u));
+                List<R> batchResult = f.apply(list.subList(start, end), u);
+                if (batchResult != null) {
+                    result.addAll(batchResult);
+                }
                 start = end;
                 end = Math.min(end + batchSize, size);
             }
 
             return result.isEmpty() ? null : result;
         };
-
     }
 }
