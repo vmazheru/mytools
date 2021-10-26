@@ -1,5 +1,9 @@
 package mytools.function.object;
 
+/**
+ * This class should be used in lambda context where incrementing an
+ * primitive long cannot be done. This class is not thread safe.
+ */
 public final class LongCounter {
 
     private long i;
